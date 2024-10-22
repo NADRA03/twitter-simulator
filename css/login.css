@@ -1,0 +1,73 @@
+body{
+ display: flex;  
+ justify-content: center; 
+ align-items: center;
+ height: 40rem;
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ color: rgb(43, 41, 36);
+ background-image: linear-gradient(to right, #464351 0%, #60587e 100%);
+}
+
+.login {
+    border: 1px solid black;
+    border-radius: 1rem;
+    box-shadow:  0 0 10px rgb(63, 57, 95);
+    width: 25rem;
+    height: 30rem;
+    overflow: hidden;
+}
+
+.form {
+    display:grid;
+    place-content: center;
+    box-sizing: border-box;
+    background-image: url(login.jpg) ;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.h1{
+    display: grid;
+    place-content: center;
+    margin-top: -1rem;
+    font-size: 2.5rem;
+    color: rgba(204, 204, 227, 0.669);
+}
+
+input{
+    background:transparent ;
+    width: 13rem;
+    height: 1.5rem;
+    font-size: 0.9rem;
+    border:0.5px solid rgb(124, 121, 134);
+    border-radius: 0.5rem;
+    padding: 5px;
+}
+
+::placeholder{
+    color: rgba(136, 136, 131, 0.742);
+    padding: 4px;
+}
+
+label{
+    font-size: 1.1rem;
+    padding: 0.3rem;
+    color: rgba(168, 168, 229, 0.633) ;
+}
+
+button{
+    margin-top: 20px;
+    height: 25px;
+    width: 5rem;
+    margin-left: 4rem;
+    font-weight: bold;
+    border:0.5px solid rgb(59, 59, 61) ;
+    border-radius: 0.5rem;
+    color: rgb(41, 41, 45);
+    background-color: rgb(132, 132, 175);
+}

@@ -1,0 +1,14 @@
+.header{
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    height: 6rem;
+}
+
+.header .row {
+    position: absolute;
+    left: 0;
+    bottom: -11rem;
+    width: 100%;
+    
+}
