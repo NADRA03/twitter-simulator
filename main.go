@@ -34,4 +34,5 @@ func main() {
 
 	log.Println("server started on :8088")
 	log.Fatal(http.ListenAndServe(":8088", nil))
+	log.Println("a")
 }
