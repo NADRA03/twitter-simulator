@@ -1,0 +1,72 @@
+body {
+    display: flex;  
+    justify-content: center; 
+    align-items: center;
+    height: 100vh; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: rgb(40, 36, 43);
+    background-image: url(wallpaber.jpg);
+}
+
+.sigin {
+    color: #230625;
+    background-color: rgb(248, 233, 248); /* Solid white background for visibility */
+    border: 1px solid black;
+    border-radius: 1rem;
+    height: 560px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 300px; /* Fixed width */
+    padding: 10px; /* Add padding inside the box */
+    display: flex; /* Use flexbox */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center items */
+}
+
+.form {
+    flex-direction: column;      /* Stack items vertically */
+    align-items: center;         /* Center items horizontally */
+    width: 100%;                 /* Ensure the form takes full width */
+}
+
+
+.h1 {
+    display: grid;
+    place-content: center;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    color: #230625;
+}
+
+input {
+    background: transparent;
+    width: 100%; /* Make input full width */
+    height: 1.5rem;
+    font-size: 0.9rem;
+    border: 0.5px solid rgb(124, 121, 134);
+    border-radius: 0.5rem;
+    padding: 1px;
+}
+
+::placeholder {
+    color: rgba(136, 136, 131, 0.742);
+}
+
+label {
+    font-size: 1.1rem;
+    padding: 0.3rem;
+    color: rgba(54, 14, 62, 0.633);
+}
+
+.signupButton {
+    margin-top: 20px;
+    height: 2rem; /* Increased height for better visibility */
+    width: 30%; /* Make button full width */
+    font-weight: bold;
+    border: 1.5px solid rgb(240, 128, 231);
+    border-radius: 0.5rem;
+    color: rgb(41, 41, 45);
+    background-color: rgb(227, 179, 239);
+    margin-left: 90px;
+    margin-top: 40px;
+}

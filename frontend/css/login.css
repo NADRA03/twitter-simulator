@@ -1,0 +1,64 @@
+body {
+    display: flex;  
+    justify-content: center; 
+    align-items: center;
+    height: 100vh; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: rgb(40, 36, 43);
+    background-image: url(wallpaber.jpg);
+}
+
+.login {
+    color: #230625;
+    background-color: rgb(248, 233, 248); /* Solid white background for visibility */
+    border: 1px solid black;
+    border-radius: 1rem;
+    height: 400px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 300px; /* Fixed width */
+    padding: 20px; /* Add padding inside the box */
+    display: flex; /* Use flexbox */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center items */
+}
+
+.form {
+    flex-direction: column;      /* Stack items vertically */
+    align-items: center;         /* Center items horizontally */
+    width: 100%;                 /* Ensure the form takes full width */
+}
+
+.h1 {
+    margin: 0 0 20px; /* Margin for spacing */
+    font-size: 2.5rem;
+    color: #230625;
+}
+
+input {
+    background: #fff; /* Solid background for inputs */
+    width: 90%; /* Full width */
+    height: 1.75rem; /* Height for inputs */
+    font-size: 1rem;
+    border: 1px solid rgb(124, 121, 134);
+    border-radius: 0.5rem;
+    padding: 2px;
+    margin-bottom: 5px; /* Space between inputs */
+}
+
+button {
+    height: 2rem; /* Button height */
+    width: 40%; /* Full width */
+    font-weight: bold;
+    border: 1.5px solid rgb(240, 128, 231);
+    border-radius: 0.5rem;
+    color: rgb(41, 41, 45);
+    background-color: rgb(227, 179, 239);
+    padding: 1px;
+    margin: 0.2rem 0;
+    margin-left: 80px;
+}
+
+.lable {
+    color: #260126;         /* Change this to your desired color */
+    margin: 0.5rem 0;            /* Add some spacing around labels */
+}
