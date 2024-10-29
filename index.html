@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My App</title>
+    <link rel="stylesheet" href="./css/index.css"> 
+    <link rel="stylesheet" href="./css/chats.css">
+    <link rel="stylesheet" href="./css/log-in.css">
+</head>
+<body>
+    <div id="sidebar2" class="sidebar-left"></div>
+    <div id="app"></div>
+    <div id="sidebar" class="sidebar-right"></div>
+    <script type="module">
+        import { loadSidebar, loadPage, getCurrentPage } from './loader.js';
+
+        window.onload = async () => {
+            const currentPage = await getCurrentPage();
+            await loadPage(currentPage);
+        };
+    </script>
+</body>
+</html>

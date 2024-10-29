@@ -1,0 +1,127 @@
+.login-and-signup {
+    display: flex; /* Enable Flexbox */
+    flex-direction: row; /* Arrange children in a row */
+    align-items: center; /* Center items vertically */
+    justify-content: space-between; /* Space out items evenly */
+
+#login-form,
+#signup-form  {
+    position: absolute; /* Position it absolutely to the parent */
+    top: 200px; /* Adjust according to your design */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Shift back by 50% of its width */
+    width: 300px; /* Set a fixed width for the form */
+    background: white; /* Add background for better visibility */
+    border: 1px solid #ccc; /* Optional: Add a border */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for depth */
+    padding: 20px; /* Optional: Add padding */
+    z-index: 1000; /* Ensure it appears above other content */
+    display: none; /* Keep it hidden initially */
+    border-radius: 8px; /* Rounded corners */
+}
+
+.logo{
+    margin-right: 400px;
+    width: 400px; /* Example width */
+    height: 400px; /* Example height */
+    fill: white; /* Example color */
+}
+
+/* Close Button Styles */
+#closeLoginForm {
+    position: absolute; /* Position it absolutely within the form */
+    top: 10px; /* Align it at the top */
+    right: 10px; /* Align it to the right */
+    background: none; /* No background */
+    border: none; /* No border */
+    font-size: 16px; /* Font size for the close button */
+    cursor: pointer; /* Change cursor to pointer */
+    color: #888; /* Color for the close button */
+}
+
+/* Form Header */
+.h1 {
+    font-size: 24px; /* Font size for the heading */
+    margin-bottom: 15px; /* Space below the heading */
+    text-align: center; /* Center the heading */
+}
+
+/* Labels */
+.label {
+    display: block; /* Block display to have full width */
+    margin-bottom: 5px; /* Space below the label */
+    font-weight: bold; /* Bold text */
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="password"] {
+    width: 100%; /* Full width for input fields */
+    padding: 10px; /* Padding inside the input */
+    margin-bottom: 15px; /* Space below the input */
+    border: 1px solid #ccc; /* Border for the input */
+    border-radius: 4px; /* Rounded corners */
+    box-sizing: border-box; /* Include padding in the width calculation */
+}
+
+/* Submit Button */
+#loginButton {
+    width: 100%; /* Full width for the button */
+    padding: 10px; /* Padding for the button */
+    background-color: #007bff; /* Primary color for the button */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Change cursor to pointer */
+    font-size: 16px; /* Font size */
+}
+
+/* Button Hover Effect */
+#loginButton:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Sign Up Button */
+button[type="button"] {
+    width: 100%; /* Full width for the button */
+    padding: 10px; /* Padding for the button */
+    background-color: #f8f9fa; /* Light background color */
+    color: #007bff; /* Primary color for text */
+    border: 1px solid #007bff; /* Border matching the text color */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Change cursor to pointer */
+    font-size: 16px; /* Font size */
+    margin-top: 10px; /* Space above the button */
+}
+
+/* Sign Up Button Hover Effect */
+button[type="button"]:hover {
+    background-color: #e2e6ea; /* Slightly darker on hover */
+}
+
+#goToLoginButton,
+#goToSignupButton {
+    background-color: #007bff; /* Primary color */
+    color: white; /* Text color */
+    padding: 10px 20px; /* Vertical and horizontal padding */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transition: background-color 0.3s, transform 0.2s; /* Transition effects */
+    margin-right: 500px;
+}
+
+#goToLoginButton:hover, 
+#goToSignupButton:hover {
+    background-color: #0056b3; /* Darker shade for hover */
+    transform: scale(1.05); /* Slightly enlarge button */
+}
+
+#goToLoginButton:focus,
+#goToSignupButton:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add shadow on focus */
+}
+
+}

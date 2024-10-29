@@ -1,4 +1,4 @@
-package twitter
+package backend
 
 import (
 	"database/sql"
@@ -126,11 +126,10 @@ func ValidateSession(w http.ResponseWriter, r *http.Request, db *sql.DB) (*Sessi
 		if err.Error() == "session expired" {
 			err = DeleteSession(w, r, db)
 			if err != nil {
-				
 				fmt.Printf("Error deleting expired session: %v\n", err)
 			}
 		}
-		http.Redirect(w, r, "/log-in", http.StatusSeeOther)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return nil, err
 	}
 	return session, nil

@@ -1,0 +1,132 @@
+.chats{
+    position: absolute; /* Ensure this is relative for absolute children */
+    top: 50px;
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+h2 {
+    color: white;
+    margin-top: 20px;
+}
+
+/* Form styles */
+form {
+    background-color: #000000;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+/* Input field styles */
+input[type="text"],
+input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Button styles */
+button {
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+button:hover {
+}
+
+/* Chat list styles */
+#chatList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#chatList li {
+    background-color: black;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 5px 0;
+    transition: background-color 0.2s ease;
+}
+
+/* Chat list hover effect */
+#chatList li:hover {
+    background-color: #dcdcdcd1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    input[type="text"],
+    input[type="number"],
+    button {
+        width: 100%;
+    }
+}
+
+.chat-item {
+    display: flex; /* Enable Flexbox */
+    flex-direction: row; /* Arrange children in a row */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Space out items evenly */
+    width: 400px;
+
+    .chat-button {
+        background-color: white;
+        margin-right: 20%; /* Adjust margin as needed */
+        width: 100px; /* Increased width */
+        height: 100px; /* Increased height */
+        border-radius: 50%; /* Make the image circular */
+        object-fit: cover; /* Ensure the image covers the entire circle */
+        display: block; /* Ensure the image behaves as a block element */
+    }
+
+    svg {
+        width: 100px; /* Set a fixed width */
+        height: 100px; /* Set a fixed height */
+    }
+}
+
+#createChatFormContainer {
+    align-items: center;
+    position: absolute; /* Position it absolutely to the parent */
+    top: 200px; /* Adjust according to your design */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Shift back by 50% of its width */
+    width: 300px; /* Set a fixed width for the form */
+    background: black; /* Add background for better visibility */
+    border: 1px solid #ccc; /* Optional: Add a border */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for depth */
+    padding: 20px; /* Optional: Add padding */
+    z-index: 1000; /* Ensure it appears above other content */
+    display: none; /* Keep it hidden initially */
+    border-radius: 8px; /* Rounded corners */
+
+    #closeChatFormButton {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+#showChatFormButton {
+    position: absolute;
+    left: 100%;
+    bottom: 100%;
+    font-weight: 300;
+    background-color: transparent;
+}
+}
