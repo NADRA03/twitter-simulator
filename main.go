@@ -4,12 +4,25 @@ import (
     "twitter/backend"
     "fmt"
     "net/http"
+    "strings"
 )
 
 // indexHandler serves index.html for any request
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-    // Serve index.html for any route
+    if strings.HasSuffix(r.URL.Path, ".js") || strings.HasSuffix(r.URL.Path, ".css") || strings.HasPrefix(r.URL.Path, "/fonts/") {
+        http.NotFound(w, r) // Let static file handlers take over
+        return
+    }
     http.ServeFile(w, r, "./index.html")
+}
+
+func chatHandler(w http.ResponseWriter, r *http.Request) {
+    id := strings.TrimPrefix(r.URL.Path, "/chat/")
+    if id == "" {
+        http.NotFound(w, r)
+        return
+    }
+    indexHandler(w, r) // or other logic to load the correct page
 }
 
 func main() {
@@ -25,7 +38,7 @@ func main() {
         }
     })
     http.HandleFunc("/chats", indexHandler)     
-    http.HandleFunc("/chat/", indexHandler)     
+    http.HandleFunc("/chat/", chatHandler)   
     
     handler := &twitter.ChatsHandler{}
 	http.HandleFunc("/chats/create", handler.CreateChatHandler)
@@ -34,6 +47,7 @@ func main() {
     http.HandleFunc("/allusers", twitter.GetAllUserDetailsHandler)
     http.HandleFunc("/log-in/create-account", twitter.SignUpHandler) 
     http.HandleFunc("/User", twitter.UserDetailsHandler) 
+    http.HandleFunc("/search-users", twitter.SearchUsers)
 
     http.Handle("/loader.js", http.FileServer(http.Dir("."))) 
     http.Handle("/sidebar.js", http.FileServer(http.Dir("."))) 
@@ -49,6 +63,7 @@ func main() {
     http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./fonts"))))
     http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
     // Start the server on port 8080
+
     fmt.Println("Server started at :8088")
     if err := http.ListenAndServe(":8088", nil); err != nil {
         fmt.Println("Error starting server:", err)

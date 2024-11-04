@@ -1,6 +1,4 @@
 .chats{
-    position: absolute; /* Ensure this is relative for absolute children */
-    top: 50px;
 h1 {
     color: #333;
     text-align: center;
@@ -48,14 +46,17 @@ button:hover {
 #chatList {
     list-style-type: none;
     padding: 0;
+    width: 100%;
 }
 
 #chatList li {
     background-color: black;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid rgb(62, 65, 68);
+    border-radius: 0px;
+    position: relative;
     padding: 10px;
     margin: 5px 0;
+    width: 100%;
     transition: background-color 0.2s ease;
 }
 
@@ -78,10 +79,9 @@ button:hover {
     flex-direction: row; /* Arrange children in a row */
     align-items: center; /* Center items vertically */
     justify-content: center; /* Space out items evenly */
-    width: 400px;
 
     .chat-button {
-        background-color: white;
+        background-color: transparent;
         margin-right: 20%; /* Adjust margin as needed */
         width: 100px; /* Increased width */
         height: 100px; /* Increased height */
@@ -104,12 +104,12 @@ button:hover {
     transform: translateX(-50%); /* Shift back by 50% of its width */
     width: 300px; /* Set a fixed width for the form */
     background: black; /* Add background for better visibility */
-    border: 1px solid #ccc; /* Optional: Add a border */
+    border: 1px solid rgb(62, 65, 68);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for depth */
     padding: 20px; /* Optional: Add padding */
     z-index: 1000; /* Ensure it appears above other content */
     display: none; /* Keep it hidden initially */
-    border-radius: 8px; /* Rounded corners */
+    border-radius: 0px; /* Rounded corners */
 
     #closeChatFormButton {
         background: none;
@@ -123,9 +123,7 @@ button:hover {
 }
 
 #showChatFormButton {
-    position: absolute;
-    left: 100%;
-    bottom: 100%;
+    position: relative;
     font-weight: 300;
     background-color: transparent;
 }

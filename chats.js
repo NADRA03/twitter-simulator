@@ -86,7 +86,7 @@ async function fetchUserChats() {
             chatItem.innerHTML = `
             <button class="chat-button" data-chat-id="${chat.chat_id}">
                 <img src="${chat.image}" alt="${chat.name}" class="chat-image" 
-                      onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; fill=&quot;none&quot; height=&quot;48&quot; width=&quot;48&quot; stroke=&quot;currentColor&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; stroke-width=&quot;2&quot; viewBox=&quot;0 0 24 24&quot;><path d=&quot;M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2&quot;/><circle cx=&quot;9&quot; cy=&quot;7&quot; r=&quot;4&quot;/><path d=&quot;M23 21v-2a4 4 0 0 0-3-3.87&quot;/><path d=&quot;M16 3.13a4 4 0 0 1 0 7.75&quot;/></svg>'" />
+                />
             </button>
             <div class="chat-details">
                 <h3>${chat.name}</h3>
@@ -119,7 +119,6 @@ async function fetchUserChats() {
 export function render() {
     return `
         <div class="chats">
-            <h2>Your Chats</h2>
 
             <button id="showChatFormButton">Add</button>
 

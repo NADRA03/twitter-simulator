@@ -65,9 +65,20 @@ export async function loadPage(page) {
                     app.innerHTML = module.render();
                     break;
             case 'chat':
+                // Render the main chat page (chats) and initialize chat-specific module
+                module = await import('./chats.js');
+                app.innerHTML = module.render();
+                module.initialize();
+
                 const chatId = parts[1];
                 const chatModule = await import('./chat.js');
                 document.getElementById('sidebar2').innerHTML = chatModule.render(chatId);
+                chatModule.initialize(chatId);
+
+                // Update URL if not already set
+                if (window.location.pathname !== `/chat/${chatId}`) {
+                    history.pushState({}, '', `/chat/${chatId}`);
+                }
                 break;
             default:
                 app.innerHTML = '<h1>404 Not Found</h1>';

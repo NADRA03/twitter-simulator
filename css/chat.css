@@ -1,0 +1,177 @@
+.disable-buttons button:not(.confirmation-block button) {
+    pointer-events: none;
+}
+
+
+.chatContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    margin: 0 auto; 
+    color: white;
+    background-color: black;
+
+#chatMessages {
+    flex: 1; 
+    padding: 10px;
+    overflow-y: auto; 
+    background-color: black;
+}
+
+
+#messageInput {
+    width: calc(100% - 80px); 
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+
+#sendMessageBtn {
+    width: 60px;
+    padding: 10px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    border-radius: 0 5px 5px 0;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#sendMessageBtn:hover {
+    background-color: #45a049;
+}
+
+ input, button {
+    box-sizing: border-box;
+}
+
+.info-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#addPeopleButton {
+    background-color: #4CAF50; /* Bootstrap primary color */
+    color: white;
+    margin-top: 20px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px; /* Space above the button */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+/* Hover effect for Add People button */
+#addPeopleButton:hover {
+    background-color: #4CAF50; /* Darker shade for hover effect */
+}
+
+/* Styles for the Confirm Add People button */
+#confirmAddPeopleBtn {
+    background-color: transparent; /* Bootstrap success color */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px; /* Space between input and button */
+}
+
+/* Hover effect for Confirm Add People button */
+#confirmAddPeopleBtn:hover {
+    background-color: transparent; /* Darker shade for hover effect */
+}
+
+.info-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure it appears above other elements */
+    padding: 20px;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+button {
+    box-sizing: border-box; /* Ensures padding is included in the button size */
+}
+
+#addPeopleInput{
+    background-color: transparent;
+    color: white;
+}
+
+#noUsersMessage {
+ margin-top: 20px;
+ color: white;
+}
+}
+
+.confirmation-block {
+    display: block; /* Make it visible */
+    position: absolute;
+    top: 50%; /* Center vertically */
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center it fully */
+    width: 300px;
+    background: #333;
+    color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 2000;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.confirmation-block p {
+    margin-bottom: 15px; /* Space below the paragraph */
+}
+
+.confirmation-block button {
+    padding: 8px 16px; /* Button padding */
+    margin: 0 10px; /* Space between buttons */
+    background-color: #007bff; /* Button color */
+    color: #fff; /* Text color */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.confirmation-block button#noInviteBtn {
+    background-color: #dc3545; /* Different color for "No" button */
+}
+
+.confirmation-block button:hover {
+    opacity: 0.9; /* Slight fade effect on hover */
+}

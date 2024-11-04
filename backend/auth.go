@@ -7,7 +7,22 @@ import(
 	"encoding/json"
 	"database/sql"
 	"golang.org/x/crypto/bcrypt"
+    "time"
 )
+
+type User struct {
+	Id        int            `json:"id"`          // Unique identifier for the user
+	Username  string         `json:"username"`    // Unique username for the user
+	Email     string         `json:"email"`       // Unique email for the user
+	FirstName string         `json:"first_name"`  // User's first name
+	LastName  string         `json:"last_name"`   // User's last name
+	Age       int            `json:"age"`         // User's age
+	Gender    string         `json:"gender"`      // User's gender
+	Password  string         `json:"password"`    // User's password (hashed ideally)
+	ImageURL  sql.NullString  `json:"image_url"`   // Optional image URL for the user
+	Role      string         `json:"role"`        // User's role (e.g., admin, user)
+	CreatedAt time.Time      `json:"created_at"`  // Timestamp for when the user was created  
+}
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/log-in" {
@@ -137,14 +152,6 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
             return
         }
     }
-}
-
-
-type User struct {
-	Username string `json:"username"`
-	ImageURL sql.NullString `json:"image_url"`
-	Id       int    `json:"id"`
-    Email    string `json:"email"`      
 }
 
 // GetAllUserDetailsHandler retrieves all user details and sends them as a JSON response
