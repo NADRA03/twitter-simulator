@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"strconv"
     "time"
+    "sync"
+    "database/sql"
+    "github.com/gorilla/websocket" 
 )
 
 type Invitation struct {
@@ -27,15 +30,19 @@ type ChatDetails struct {
 
 type Message struct {
     MessageID   int       `json:"message_id"`   
-    MessageText string    `json:"message_text"`
-    ImageURL    string    `json:"image_url"`    
-    CreatedAt   time.Time `json:"created_at"`
+    MessageText  sql.NullString   `json:"message_text"`
+    ImageURL     sql.NullString   `json:"image_url"`    
+    CreatedAt   sql.NullTime `json:"created_at"`
 }
 
 
 
 // ChatsHandler handles requests related to chat functionalities
-type ChatsHandler struct{}
+type ChatsHandler struct{
+	connections map[*websocket.Conn]int // WebSocket connections and their associated chat IDs
+	mutex       sync.Mutex
+	upgrader    websocket.Upgrader
+}
 
 // CreateChatHandler handles the creation of a new chat
 func (h *ChatsHandler) CreateChatHandler(w http.ResponseWriter, r *http.Request) {
@@ -110,51 +117,65 @@ func (h *ChatsHandler) CreateChatHandler(w http.ResponseWriter, r *http.Request)
 
 // AddUserToChatHandler handles adding a user to a chat
 func (h *ChatsHandler) AddUserToChatHandler(w http.ResponseWriter, r *http.Request) {
-    session, err := ValidateSession(w, r, db)
+    // Validate the session
+    _, err := ValidateSession(w, r, db)
     if err != nil {
+        log.Println("Session validation failed:", err)
         return
     }
 
+    // Parse the form data
     if err := r.ParseForm(); err != nil {
+        log.Println("Error parsing form data:", err)
         http.Error(w, "Error parsing form data", http.StatusBadRequest)
         return
     }
 
+    // Log all form values for inspection
+    log.Println("Form values:", r.Form)
+
+    // Parse chat_id
     chatID, err := strconv.Atoi(r.FormValue("chat_id"))
     if err != nil {
+        log.Println("Invalid chat ID:", r.FormValue("chat_id"), err)
         http.Error(w, "Invalid chat ID", http.StatusBadRequest)
         return
     }
-    
+
+    // Parse user_id
     userIDStr := r.FormValue("user_id")
-    log.Println("Received user ID:", userIDStr)
+    log.Println("Received user ID string:", userIDStr)
 
     userID, err := strconv.Atoi(userIDStr)
     if err != nil {
+        log.Println("Invalid user ID:", userIDStr, err)
         http.Error(w, "Invalid user ID", http.StatusBadRequest)
         return
     }
 
     log.Println("Parsed user ID:", userID)
 
+    // Check user permissions
     role := r.FormValue("role")
-    if session.UserID != userID {
-        http.Error(w, "Permission denied", http.StatusForbidden)
-        return
-    }
-
+    // if session.UserID != userID {
+    //     log.Println("Permission denied for user ID:", userID)
+    //     http.Error(w, "Permission denied", http.StatusForbidden)
+    //     return
+    // }
+    
+    // Insert the user into chat_users
     query := "INSERT INTO chat_users (chat_id, user_id, role) VALUES (?, ?, ?)"
     _, err = db.Exec(query, chatID, userID, role)
     if err != nil {
+        log.Println("Error adding user to chat:", err)
         http.Error(w, fmt.Sprintf("Error adding user to chat: %v", err), http.StatusInternalServerError)
         return
     }
 
+    // Respond with no content on success
+    log.Println("User added to chat successfully:", userID, "to chat ID:", chatID)
     w.WriteHeader(http.StatusNoContent)
 }
-
-
-
 
 // GetUserChatsHandler handles fetching the chats for a user
 func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Request) {
@@ -262,67 +283,6 @@ func CreateInvitationHandler(h *ChatsHandler) http.HandlerFunc {
     }
 }
 
-func (h *ChatsHandler) AddMessageHandler(w http.ResponseWriter, r *http.Request) {
-    session, err := ValidateSession(w, r, db)
-    if err != nil {
-        return
-    }
-
-    // Use the UserID from the session
-    userID := session.UserID
-
-    if err := r.ParseForm(); err != nil {
-        http.Error(w, "Error parsing form data", http.StatusBadRequest)
-        return
-    }
-
-    chatIDStr := r.FormValue("chat_id")
-    chatID, err := strconv.Atoi(chatIDStr)
-    if err != nil {
-        http.Error(w, "Invalid chat ID", http.StatusBadRequest)
-        return
-    }
-
-    log.Println("Parsed chat ID:", chatID)
-
-    // Check if the user is part of the chat before allowing them to send a message
-    if !h.IsUserInChat(userID, chatID) {
-        http.Error(w, "User is not part of this chat", http.StatusForbidden)
-        return
-    }
-
-    messageText := r.FormValue("message_text")
-    imageURL := r.FormValue("image_url") // Assuming this field is optional
-
-    query := "INSERT INTO messages (chat_id, user_id, message_text, image_url) VALUES (?, ?, ?, ?)"
-    _, err = db.Exec(query, chatID, userID, messageText, imageURL)
-    if err != nil {
-        http.Error(w, fmt.Sprintf("Error adding message: %v", err), http.StatusInternalServerError)
-        return
-    }
-
-    w.WriteHeader(http.StatusNoContent)
-}
-
-// Helper function to check if a user is part of the chat
-func (h *ChatsHandler) IsUserInChat(userID, chatID int) bool {
-    var exists bool
-    query := "SELECT EXISTS(SELECT 1 FROM chat_users WHERE chat_id = ? AND user_id = ?)"
-    err := db.QueryRow(query, chatID, userID).Scan(&exists)
-    if err != nil {
-        log.Println("Error checking user in chat:", err)
-        return false
-    }
-    return exists
-}
-
-
-
-
-
-
-
-
 // GetChatDetailsHandler handles fetching chat details including messages and users
 func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Request) {
     log.Println("Request received to fetch chat details")
@@ -349,13 +309,14 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
             c.id AS chat_id,
             c.chat_name,
             c.image AS image_url,
-            u.user_id,
+            u.id,
             u.username AS name,
+            u.image_url, -- Assuming this column exists in your users table
             m.message_text,
             m.created_at
         FROM chats c
         LEFT JOIN chat_users cu ON c.id = cu.chat_id
-        LEFT JOIN users u ON cu.user_id = u.user_id
+        LEFT JOIN users u ON cu.user_id = u.id
         LEFT JOIN messages m ON c.id = m.chat_id
         WHERE c.id = ?
     `
@@ -380,10 +341,11 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
     for rows.Next() {
         var userID int
         var userName string
-        var messageText string
-        var createdAt time.Time
+        var profileImage sql.NullString  // New variable for profile image
+        var messageText sql.NullString
+        var createdAt sql.NullTime
 
-        err := rows.Scan(&chatDetails.ChatID, &chatDetails.ChatName, &chatDetails.ImageURL, &userID, &userName, &messageText, &createdAt)
+        err := rows.Scan(&chatDetails.ChatID, &chatDetails.ChatName, &chatDetails.ImageURL, &userID, &userName, &profileImage, &messageText, &createdAt)
         if err != nil {
             log.Printf("Error scanning chat data: %v", err)
             http.Error(w, "Error scanning chat data", http.StatusInternalServerError)
@@ -392,34 +354,33 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
 
         // Add user details to the map if not already added
         if _, exists := userMap[userID]; !exists {
-            userMap[userID] = User{Id: userID, Username: userName}
+            userMap[userID] = User{Id: userID, Username: userName, ImageURL: profileImage} // Include profile image
         }
 
         // Add message to messages slice if messageText is not empty
-        if messageText != "" {
+        if messageText.Valid {
             messages = append(messages, Message{MessageText: messageText, CreatedAt: createdAt})
         }
     }
 
-    // Populate chat details users from the map
+    // Convert user map to slice
+    var users []User
     for _, user := range userMap {
-        chatDetails.Users = append(chatDetails.Users, user)
+        users = append(users, user)
     }
 
-    // Check for any errors that occurred during iteration
-    if err := rows.Err(); err != nil {
-        log.Printf("Error reading chat data: %v", err)
-        http.Error(w, "Error reading chat data", http.StatusInternalServerError)
-        return
+    // Prepare response with chat details, users, and messages
+    response := struct {
+        ChatDetails ChatDetails `json:"chat_details"`
+        Users       []User      `json:"users"`
+        Messages    []Message   `json:"messages"`
+    }{
+        ChatDetails: chatDetails,
+        Users:       users,
+        Messages:    messages,
     }
-
-    // Assign messages to chat details
-    chatDetails.Messages = messages
-
-    // Set the response header to JSON and send the chat details
+    log.Printf("sent details")
+    // Set response header and encode response
     w.Header().Set("Content-Type", "application/json")
-    if err := json.NewEncoder(w).Encode(chatDetails); err != nil {
-        log.Printf("Error encoding response as JSON: %v", err)
-        http.Error(w, "Error encoding response as JSON", http.StatusInternalServerError)
-    }
+    json.NewEncoder(w).Encode(response)
 }

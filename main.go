@@ -40,14 +40,16 @@ func main() {
     http.HandleFunc("/chats", indexHandler)     
     http.HandleFunc("/chat/", chatHandler)   
     
-    handler := &twitter.ChatsHandler{}
+    handler := twitter.NewChatsHandler()
 	http.HandleFunc("/chats/create", handler.CreateChatHandler)
 	http.HandleFunc("/chats/addUser", handler.AddUserToChatHandler)
 	http.HandleFunc("/chats/user", handler.GetUserChatsHandler)
     http.HandleFunc("/allusers", twitter.GetAllUserDetailsHandler)
     http.HandleFunc("/log-in/create-account", twitter.SignUpHandler) 
     http.HandleFunc("/User", twitter.UserDetailsHandler) 
+    http.HandleFunc("/chat_details", handler.GetChatDetailsHandler) 
     http.HandleFunc("/search-users", twitter.SearchUsers)
+    http.HandleFunc("/ws", handler.WebSocketHandler)
 
     http.Handle("/loader.js", http.FileServer(http.Dir("."))) 
     http.Handle("/sidebar.js", http.FileServer(http.Dir("."))) 

@@ -1,31 +1,87 @@
 let socket; 
+let chatId;
+let globalChatDetails = null;
+let globalUsers = [];
+let globalMessages = [];
+
 
 export function render(chatId) {
+    console.log("Rendering users:", globalUsers);  // Log globalUsers to confirm data
     return `
-    <div class="chatContainer">
-        <button id="infoButton" class="info-button">Info</button>
-        <div id="chatMessages"></div>
-        <div id="send">
-            <input type="text" id="messageInput" placeholder="Type your message..." />
-            <button id="sendMessageBtn">Send</button>
-        </div>
-        <div id="infoBox" class="info-box" style="display: none;">
-            <button id="closeInfoBox" class="close-button">X</button>
-            <br>
-            <p>Information about the chat...</p>
-            <button id="addPeopleButton">Invite</button> <!-- Add People button inside infoBox -->
-            <div id="addPeopleSection" style="display: none;">
-                <p>Add people to the chat:</p>
-                <input type="text" id="addPeopleInput" />
-                <button style="display: none;" id="confirmAddPeopleBtn">Add</button>
+        <div class="chatContainer">
+            <button id="infoButton" class="info-button">Info</button>
+
+           <!-- Chat messages section -->
+            <div id="chatMessages">
+                ${globalMessages && globalMessages.length > 0 ? globalMessages.map(message => `
+                    <div class="message-item">
+                        <span class="message-username">${message.username}:</span>
+                        <span class="message-text">${message.message_text}</span>
+                        ${message.image_url ? `<img src="${message.image_url}" alt="Attached image" class="message-image" />` : ''}
+                    </div>
+                `).join('') : '<p>No messages yet.</p>'}
             </div>
-            <div id="userSearchResults"></div> <!-- Container for search results -->
+
+            <div id="send">
+                <input type="text" id="messageInput" placeholder="Type your message..." />
+                <input type="text" id="imageInput" style="display: none;" placeholder="Type your message..." />
+                <button id="sendMessageBtn">Send</button>
+            </div>
+            <div id="infoBox" class="info-box" style="display: none;">
+                <button id="closeInfoBox" class="close-button">X</button>
+                <br>
+                <p>Information about the chat...</p>
+                <button id="addPeopleButton">Invite</button>
+                <div id="addPeopleSection" style="display: none;">
+                    <p>Add people to the chat:</p>
+                    <input type="text" id="addPeopleInput" />
+                    <button style="display: none;" id="confirmAddPeopleBtn">Add</button>
+                </div>
+                <div id="userSearchResults"></div>
+
+                <!-- User list section -->
+                <div id="userList" class="user-list">
+                <h3>Participants</h3>
+                ${(() => {
+                    let userHtml = ''; // Initialize an empty string for the HTML
+                    globalUsers.forEach(user => {
+                        userHtml += `
+                            <div class="user-item">
+                                <img src="${user.image_url.String || 'placeholder-image-url.jpg'}" alt="${user.username}'s profile picture" class="user-image" />
+                                <span class="user-name">${user.username}</span>
+                            </div>
+                        `;
+                    });
+                    return userHtml; // Return the complete HTML string
+                })()}
+                </div>
+            </div>
         </div>
-    </div>`;
+    `;
+}
+
+function enableAllButtons() {
+    const allButtons = document.querySelectorAll("button");
+    allButtons.forEach(button => {
+        button.disabled = false; // Enable all buttons
+    });
+}
+
+function displayMessage(messageData) {
+    const chatMessages = document.getElementById("chatMessages");
+    const messageElement = document.createElement("div");
+    
+    messageElement.innerHTML = `
+        <span class="message-username">${messageData.user_id}:</span>
+        <span class="message-text">${messageData.message_text}</span>
+        ${messageData.image_url ? `<img src="${messageData.image_url}" alt="Attached image" class="message-image" />` : ''}
+    `;
+    
+    chatMessages.appendChild(messageElement);
 }
 
 function initializeWebSocket(chatId) {
-    const socketUrl = `ws://localhost:8080/chat/${chatId}`; 
+    const socketUrl = `ws://localhost:8088/ws?chat_id=${chatId}`; 
     socket = new WebSocket(socketUrl);
 
     socket.onopen = () => {
@@ -47,25 +103,48 @@ function initializeWebSocket(chatId) {
 }
 
 function sendMessage(chatId) {
-    const messageInput = document.getElementById("messageInput");
-    const messageText = messageInput.value;
-    if (messageText) {
-        const messageData = {
-            chatId: chatId,
-            userId: 1, 
-            messageText: messageText
-        };
-        socket.send(JSON.stringify(messageData));
-        messageInput.value = ""; 
+    try {
+        if (socket.readyState === WebSocket.OPEN) {
+            const messageInput = document.getElementById("messageInput");
+            const messageText = messageInput.value;
+            const imageInput = document.getElementById("imageInput");
+            const imageUrl = imageInput ? imageInput.value : "";
+
+            if (messageText) {
+                const messageData = {
+                    chatId: chatId,
+                    messageText: messageText,
+                    imageUrl: imageUrl
+                };
+
+                console.log("Preparing to send message:", messageData);
+
+                try {
+                    socket.send(JSON.stringify({
+                        action: "add_message",
+                        data: messageData
+                    }));
+                    console.log("Message successfully sent:", messageData);
+
+                    // Clear inputs after sending
+                    messageInput.value = "";
+                    if (imageInput) imageInput.value = "";
+                } catch (sendError) {
+                    console.error("Failed to send message:", sendError);
+                    alert("There was an error sending your message. Please try again.");
+                }
+            } else {
+                console.warn("Message text is empty, nothing to send.");
+            }
+        } else {
+            console.error("WebSocket is not open. Cannot send message.");
+            alert("Connection to the server is closed. Please check your connection.");
+        }
+    } catch (error) {
+        console.error("An error occurred in sendMessage:", error);
     }
 }
 
-function displayMessage(messageData) {
-    const chatMessages = document.getElementById("chatMessages");
-    const messageElement = document.createElement("div");
-    messageElement.textContent = `${messageData.userId}: ${messageData.messageText}`;
-    chatMessages.appendChild(messageElement);
-}
 
 function searchUsers(searchTerm) {
     if (searchTerm) {
@@ -140,7 +219,7 @@ function showInviteConfirmation(user) {
 
     // Yes button functionality
     confirmationBlock.querySelector("#yesInviteBtn").onclick = () => {
-        inviteUserToChat(user.id, chatId);
+        inviteUserToChat(user.id); // Call inviteUserToChat without passing chatId
         document.body.removeChild(confirmationBlock); // Remove after confirming
         enableAllButtons(); // Re-enable all other buttons
     };
@@ -152,16 +231,9 @@ function showInviteConfirmation(user) {
     };
 }
 
-function enableAllButtons() {
-    const allButtons = document.querySelectorAll("button");
-    allButtons.forEach(button => {
-        button.disabled = false;
-    });
-}
-
 // Function to handle inviting a user to the chat
-function inviteUserToChat(userId, chatId) {
-    fetch(`/add-user-to-chat`, {
+function inviteUserToChat(userId) {
+    fetch(`/chats/addUser`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -182,14 +254,40 @@ function inviteUserToChat(userId, chatId) {
     .catch(error => console.error('Fetch error:', error));
 }
 
+function fetchChatDetails(chatId) {
+    return fetch(`/chat_details?chat_id=${chatId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Set global variables with the response data
+            globalChatDetails = data.chat_details;
+            globalUsers = data.users;
+            globalMessages = data.messages;
+        })
+        .catch(error => {
+            console.error('Error fetching chat details:', error);
+        });
+}
 
-
-export function initialize(chatId) {
+export function initialize(chatIdParam) {
+    chatId = chatIdParam;
+    console.log("Chat ID:", chatId); // Add this line
     const chatContent = render(chatId);
     document.getElementById("sidebar2").innerHTML = chatContent;
-
+  
     initializeWebSocket(chatId);
-
+    
+    fetchChatDetails(chatId).then(() => {
+        console.log("Chat Details:", globalChatDetails);
+        console.log("Users:", globalUsers);
+        console.log("Messages:", globalMessages);
+    });
+    render(chatId);
+    
     const sendMessageBtn = document.getElementById("sendMessageBtn");
     if (sendMessageBtn) {
         sendMessageBtn.onclick = () => {
@@ -243,10 +341,9 @@ export function initialize(chatId) {
 document.addEventListener("DOMContentLoaded", () => {
     // Extract `chatId` from the URL path
     const pathSegments = window.location.pathname.split('/');
-    const chatId = pathSegments[pathSegments.length - 1]; // Get the last segment as `chatId`
-
-    if (chatId) {
-        initialize(chatId);  // Initialize with the extracted `chatId`
+    const chatIdParam = pathSegments[pathSegments.length - 1]; // Get the last segment as `chatId`
+    if (chatIdParam) {
+        initialize(chatIdParam);  // Initialize with the extracted `chatId`
     } else {
         console.error("chatId not found in the URL.");
     }

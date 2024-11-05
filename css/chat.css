@@ -135,7 +135,6 @@ button {
  margin-top: 20px;
  color: white;
 }
-}
 
 .confirmation-block {
     display: block; /* Make it visible */
@@ -175,3 +174,27 @@ button {
 .confirmation-block button:hover {
     opacity: 0.9; /* Slight fade effect on hover */
 }
+
+.user-list {
+    margin-top: 10px;
+    color: white;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.user-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-name {
+    font-weight: bold;
+}
+}
+
