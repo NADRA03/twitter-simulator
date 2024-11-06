@@ -72,7 +72,7 @@ export async function loadPage(page) {
 
                 const chatId = parts[1];
                 const chatModule = await import('./chat.js');
-                document.getElementById('sidebar2').innerHTML = chatModule.render(chatId);
+                document.getElementById('sidebar2').innerHTML = await chatModule.render(chatId);
                 chatModule.initialize(chatId);
 
                 // Update URL if not already set

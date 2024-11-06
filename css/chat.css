@@ -14,14 +14,19 @@
     color: white;
     background-color: black;
 
-#chatMessages {
-    flex: 1; 
-    padding: 10px;
-    overflow-y: auto; 
-    background-color: black;
-}
+    #chatMessages {
+        flex: 1; 
+        padding: 10px;
+        overflow-y: scroll;  /* Ensure it is scrollable */
+        background-color: black;
+        scrollbar-width: none;  /* Firefox */
+        -ms-overflow-style: none;  /* Internet Explorer and Edge */
+    }
 
-
+    #chatMessages::-webkit-scrollbar {
+        display: none;
+    }
+    
 #messageInput {
     width: calc(100% - 80px); 
     padding: 10px;
@@ -136,6 +141,73 @@ button {
  color: white;
 }
 
+.user-list {
+    margin-top: 10px;
+    color: white;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.user-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-name {
+    font-weight: bold;
+}
+
+#chatMessages .message-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: transparent;
+    border-radius: 10px;
+    max-width: 70%;
+    word-wrap: break-word;
+    font-size: 16px;
+}
+
+#chatMessages .message-item .user-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+#chatMessages .message-item .message-username {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+#chatMessages .message-item .message-text {
+    flex: 1;
+}
+
+/* If the message belongs to the logged-in user (move it to the right) */
+#chatMessages .message-item.right {
+    background-color: transparent; /* Optional: differentiate user messages */
+    margin-left: 50%;
+}
+
+/* Optional: Add a different style for messages with an image */
+#chatMessages .message-item .message-image {
+    max-width: 100%;
+    max-height: 200px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+}
+
+
 .confirmation-block {
     display: block; /* Make it visible */
     position: absolute;
@@ -174,27 +246,3 @@ button {
 .confirmation-block button:hover {
     opacity: 0.9; /* Slight fade effect on hover */
 }
-
-.user-list {
-    margin-top: 10px;
-    color: white;
-}
-
-.user-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.user-image {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-
-.user-name {
-    font-weight: bold;
-}
-}
-

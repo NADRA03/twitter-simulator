@@ -29,10 +29,11 @@ type ChatDetails struct {
 }
 
 type Message struct {
-    MessageID   int       `json:"message_id"`   
-    MessageText  sql.NullString   `json:"message_text"`
-    ImageURL     sql.NullString   `json:"image_url"`    
-    CreatedAt   sql.NullTime `json:"created_at"`
+    MessageID   int             `json:"message_id"`
+    UserID      int             `json:"user_id"`      // Add UserID field
+    MessageText sql.NullString   `json:"message_text"`
+    ImageURL    sql.NullString   `json:"image_url"`
+    CreatedAt   sql.NullTime     `json:"created_at"`
 }
 
 
@@ -309,9 +310,11 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
             c.id AS chat_id,
             c.chat_name,
             c.image AS image_url,
-            u.id,
+            u.id AS user_id,
             u.username AS name,
-            u.image_url, -- Assuming this column exists in your users table
+            u.image_url AS user_image_url,
+            m.message_id AS message_id,
+            m.user_id AS message_user_id,  -- Added user_id for messages
             m.message_text,
             m.created_at
         FROM chats c
@@ -341,11 +344,13 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
     for rows.Next() {
         var userID int
         var userName string
-        var profileImage sql.NullString  // New variable for profile image
+        var profileImage sql.NullString
+        var messageID int
+        var messageUserID int           // Variable for message user ID
         var messageText sql.NullString
         var createdAt sql.NullTime
 
-        err := rows.Scan(&chatDetails.ChatID, &chatDetails.ChatName, &chatDetails.ImageURL, &userID, &userName, &profileImage, &messageText, &createdAt)
+        err := rows.Scan(&chatDetails.ChatID, &chatDetails.ChatName, &chatDetails.ImageURL, &userID, &userName, &profileImage, &messageID, &messageUserID, &messageText, &createdAt)
         if err != nil {
             log.Printf("Error scanning chat data: %v", err)
             http.Error(w, "Error scanning chat data", http.StatusInternalServerError)
@@ -354,12 +359,17 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
 
         // Add user details to the map if not already added
         if _, exists := userMap[userID]; !exists {
-            userMap[userID] = User{Id: userID, Username: userName, ImageURL: profileImage} // Include profile image
+            userMap[userID] = User{Id: userID, Username: userName, ImageURL: profileImage}
         }
 
         // Add message to messages slice if messageText is not empty
         if messageText.Valid {
-            messages = append(messages, Message{MessageText: messageText, CreatedAt: createdAt})
+            messages = append(messages, Message{
+                MessageID:   messageID,
+                UserID:      messageUserID,  // Include user ID for each message
+                MessageText: messageText, 
+                CreatedAt:   createdAt,
+            })
         }
     }
 
@@ -380,6 +390,7 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
         Messages:    messages,
     }
     log.Printf("sent details")
+    
     // Set response header and encode response
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)

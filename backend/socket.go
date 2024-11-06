@@ -50,26 +50,22 @@ func (h *ChatsHandler) AddMessageToChat(chatID int, messageText string, imageURL
 		return
 	}
 
-	// Confirm that a row was inserted
-	rowsAffected, err := result.RowsAffected()
+	// Get the message_id of the inserted message
+	messageID, err := result.LastInsertId()
 	if err != nil {
-		logError("AddMessageToChat - Error retrieving rows affected", err)
+		logError("AddMessageToChat - Error retrieving message_id", err)
 		return
 	}
-	if rowsAffected == 0 {
-		log.Println("No rows were inserted, message was not saved to the database.")
-		return
-	}
-
-	log.Printf("Message successfully saved to database with chatID %d, userID %d", chatID, userID)
 
 	// Optionally broadcast the new message to other clients
 	message := struct {
+		MessageID   int    `json:"message_id"`
 		UserID      int    `json:"user_id"`
 		ChatID      int    `json:"chat_id"`
 		MessageText string `json:"message_text"`
 		ImageURL    string `json:"image_url"`
 	}{
+		MessageID:   int(messageID),
 		UserID:      userID,
 		ChatID:      chatID,
 		MessageText: messageText,
@@ -78,8 +74,6 @@ func (h *ChatsHandler) AddMessageToChat(chatID int, messageText string, imageURL
 
 	h.BroadcastMessageToChat(chatID, message)
 }
-
-
 
 // WebSocketHandler to handle WebSocket connections
 func (h *ChatsHandler) WebSocketHandler(w http.ResponseWriter, r *http.Request) {

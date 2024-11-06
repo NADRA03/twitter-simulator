@@ -1,30 +1,71 @@
-let socket; 
+let socket;
 let chatId;
 let globalChatDetails = null;
 let globalUsers = [];
 let globalMessages = [];
+let displayedMessageIds = new Set();
+let userLookup = {}; // Create a lookup for user details
 
+// Function to populate the user lookup
+function populateUserLookup(users) {
+    userLookup = users.reduce((lookup, user) => {
+        lookup[user.id] = {
+            username: user.username,
+            imageUrl: user.image_url ? user.image_url.String : 'placeholder-image-url.jpg'
+        };
+        return lookup;
+    }, {});
+}
 
 export function render(chatId) {
-    console.log("Rendering users:", globalUsers);  // Log globalUsers to confirm data
+    const uniqueMessageIds = new Set();
+
+    const uniqueMessages = globalMessages.filter(message => {
+        if (uniqueMessageIds.has(message.message_id)) {
+            return false;
+        }
+        uniqueMessageIds.add(message.message_id);
+        return true;
+    });
+
+    // Create a promise array for checking user details for all messages
+    const messagePromises = uniqueMessages.map(async (message) => {
+        const user = userLookup[message.user_id] || { username: 'Unknown', imageUrl: 'placeholder-image-url.jpg' };
+        
+        // Call fetchUserDetails to check if the message should go to the right
+        const isCurrentUserMessage = await fetchUserDetails(message.user_id);
+        
+        // Create the message element
+        const messageElement = `
+            <div class="message-item ${isCurrentUserMessage ? 'right' : ''}">
+                <img src="${user.imageUrl}" class="user-image" />
+                <span class="message-username">${user.username}:</span>
+                <span class="message-text">${message.message_text.String}</span>
+                ${message.image_url ? `<img src="${message.image_url.String}" class="message-image" />` : ''}
+            </div>
+        `;
+        
+        return messageElement; // Return the message element
+    });
+
+    // Wait for all promises to resolve and then join the results
+    Promise.all(messagePromises)
+        .then(messageElements => {
+            document.getElementById("chatMessages").innerHTML = messageElements.join('');
+            document.getElementById("chatMessages").scrollTop = document.getElementById("chatMessages").scrollHeight;
+        })
+        .catch(error => {
+            console.error("Error rendering messages:", error);
+        });
+
     return `
         <div class="chatContainer">
             <button id="infoButton" class="info-button">Info</button>
-
-           <!-- Chat messages section -->
             <div id="chatMessages">
-                ${globalMessages && globalMessages.length > 0 ? globalMessages.map(message => `
-                    <div class="message-item">
-                        <span class="message-username">${message.username}:</span>
-                        <span class="message-text">${message.message_text}</span>
-                        ${message.image_url ? `<img src="${message.image_url}" alt="Attached image" class="message-image" />` : ''}
-                    </div>
-                `).join('') : '<p>No messages yet.</p>'}
+                ${uniqueMessages.length > 0 ? '' : '<p>No messages yet.</p>'}
             </div>
-
             <div id="send">
                 <input type="text" id="messageInput" placeholder="Type your message..." />
-                <input type="text" id="imageInput" style="display: none;" placeholder="Type your message..." />
                 <button id="sendMessageBtn">Send</button>
             </div>
             <div id="infoBox" class="info-box" style="display: none;">
@@ -35,25 +76,18 @@ export function render(chatId) {
                 <div id="addPeopleSection" style="display: none;">
                     <p>Add people to the chat:</p>
                     <input type="text" id="addPeopleInput" />
-                    <button style="display: none;" id="confirmAddPeopleBtn">Add</button>
+                    <button id="confirmAddPeopleBtn">Add</button>
                 </div>
                 <div id="userSearchResults"></div>
 
-                <!-- User list section -->
                 <div id="userList" class="user-list">
-                <h3>Participants</h3>
-                ${(() => {
-                    let userHtml = ''; // Initialize an empty string for the HTML
-                    globalUsers.forEach(user => {
-                        userHtml += `
-                            <div class="user-item">
-                                <img src="${user.image_url.String || 'placeholder-image-url.jpg'}" alt="${user.username}'s profile picture" class="user-image" />
-                                <span class="user-name">${user.username}</span>
-                            </div>
-                        `;
-                    });
-                    return userHtml; // Return the complete HTML string
-                })()}
+                    <h3>Participants</h3>
+                    ${globalUsers.map(user => `
+                        <div class="user-item">
+                            <img src="${user.image_url.String || 'placeholder-image-url.jpg'}" alt="${user.username}'s profile picture" class="user-image" />
+                            <span class="user-name">${user.username}</span>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         </div>
@@ -67,21 +101,58 @@ function enableAllButtons() {
     });
 }
 
-function displayMessage(messageData) {
+async function fetchUserDetails(user_id) {
+    try {
+        const response = await fetch('/User');
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch user details: ${response.statusText}`);
+        }
+        
+        const user = await response.json(); // Assuming the response returns user details in JSON format
+        
+        // Return true if the user's id matches the message_id, false otherwise
+        return user.id === user_id;
+    } catch (error) {
+        console.error(error);
+        return false; // Return false if there was an error
+    }
+}
+
+async function displayMessage(messageData) {
+    // Prevent displaying the same message multiple times
+    if (displayedMessageIds.has(messageData.message_id)) {
+        return;
+    }
+    displayedMessageIds.add(messageData.message_id);
+
     const chatMessages = document.getElementById("chatMessages");
+    const user = userLookup[messageData.user_id] || { username: 'Unknown', imageUrl: 'placeholder-image-url.jpg' };
+
     const messageElement = document.createElement("div");
-    
+    messageElement.className = "message-item";
     messageElement.innerHTML = `
-        <span class="message-username">${messageData.user_id}:</span>
+        <img src="${user.imageUrl}" class="user-image" />
+        <span class="message-username">${user.username}:</span>
         <span class="message-text">${messageData.message_text}</span>
         ${messageData.image_url ? `<img src="${messageData.image_url}" alt="Attached image" class="message-image" />` : ''}
     `;
-    
+
+    // Call fetchUserDetails to check if the message should go to the right
+    const isCurrentUserMessage = await fetchUserDetails(messageData.user_id);
+    console.log("isCurrentUserMessage:", isCurrentUserMessage); 
+
+    // If the user is the same as the logged-in user, move the message to the right
+    if (isCurrentUserMessage) {
+        messageElement.classList.add('right');
+    }
+
     chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function initializeWebSocket(chatId) {
-    const socketUrl = `ws://localhost:8088/ws?chat_id=${chatId}`; 
+    const socketUrl = `ws://localhost:8088/ws?chat_id=${chatId}`;
     socket = new WebSocket(socketUrl);
 
     socket.onopen = () => {
@@ -90,16 +161,26 @@ function initializeWebSocket(chatId) {
 
     socket.onmessage = (event) => {
         const messageData = JSON.parse(event.data);
+        if (!messageData.message_id) {
+            console.warn("Message without ID received:", messageData);
+            return;
+        }
         displayMessage(messageData);
     };
 
     socket.onclose = () => {
         console.log("WebSocket connection closed.");
+        clearDisplayedMessages(); // Clear displayed messages on close to prepare for reconnection
     };
 
     socket.onerror = (error) => {
         console.error("WebSocket error:", error);
     };
+}
+
+// Define the clearDisplayedMessages function to reset the displayed messages
+function clearDisplayedMessages() {
+    displayedMessageIds.clear();
 }
 
 function sendMessage(chatId) {
@@ -263,10 +344,10 @@ function fetchChatDetails(chatId) {
             return response.json();
         })
         .then(data => {
-            // Set global variables with the response data
             globalChatDetails = data.chat_details;
             globalUsers = data.users;
             globalMessages = data.messages;
+            populateUserLookup(globalUsers); // Populate user lookup here
         })
         .catch(error => {
             console.error('Error fetching chat details:', error);
@@ -286,7 +367,6 @@ export function initialize(chatIdParam) {
         console.log("Users:", globalUsers);
         console.log("Messages:", globalMessages);
     });
-    render(chatId);
     
     const sendMessageBtn = document.getElementById("sendMessageBtn");
     if (sendMessageBtn) {
