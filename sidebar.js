@@ -8,6 +8,7 @@ export function render() {
                 <li><a href="/log-in" onclick="loadPage('log-in'); return false;">Log-in</a></li>
                 <li><a href="/log-in" onclick="loadPage('ntify'); return false;">Notifications</a></li>
                 <li><a href="/chats" onclick="loadPage('chats'); return false;">Chats</a></li>
+                <li><a href="/search" onclick="loadPage('search'); return false;">Search</a></li>
                 <li><a href="/profile" onclick="loadPage('profile'); return false;">Profile</a></li>
                 <!-- Add more chat links as needed -->
             </ul>

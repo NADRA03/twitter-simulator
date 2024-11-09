@@ -22,7 +22,6 @@ body {
     background-color: #000000; 
     font-family: 'Regular'; 
     display: flex;
-    justify-content: space-between;
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -34,7 +33,7 @@ body {
     flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align items to the top */ 
 }
 
 .sidebar-right {

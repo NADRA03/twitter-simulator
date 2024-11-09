@@ -132,8 +132,9 @@ button {
 }
 
 #addPeopleInput{
-    background-color: transparent;
-    color: white;
+    background-color: white;
+    color: black;
+    border: none;
 }
 
 #noUsersMessage {

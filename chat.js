@@ -76,7 +76,7 @@ export function render(chatId) {
                 <div id="addPeopleSection" style="display: none;">
                     <p>Add people to the chat:</p>
                     <input type="text" id="addPeopleInput" />
-                    <button id="confirmAddPeopleBtn">Add</button>
+                    <button  style="display: none;" id="confirmAddPeopleBtn">Add</button>
                 </div>
                 <div id="userSearchResults"></div>
 

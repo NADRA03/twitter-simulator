@@ -45,6 +45,11 @@ export async function loadPage(page) {
                 module = await import('./home.js');
                 app.innerHTML = module.render();
                 break;
+            case 'search':
+                    module = await import('./search.js');
+                    app.innerHTML = module.render();
+                    module.initialize();
+                    break;
             case 'sign-up':
                 module = await import('./sign-up.js');
                 app.innerHTML = module.render();
@@ -80,6 +85,17 @@ export async function loadPage(page) {
                     history.pushState({}, '', `/chat/${chatId}`);
                 }
                 break;
+            case 'a_profile':
+                    const userId = parts[1];
+                    module = await import('./a_profile.js');
+                    app.innerHTML = module.render(userId);
+                    module.initialize(userId);
+    
+                    // Update URL if not already set
+                    if (window.location.pathname !== `/a_profile/${userId}`) {
+                        history.pushState({}, '', `/a_profile/${userId}`);
+                    }
+                    break;
             default:
                 app.innerHTML = '<h1>404 Not Found</h1>';
         }
@@ -104,10 +120,14 @@ export async function getCurrentPage() {
     }
 
     if (path.startsWith('/chat/')) {
-        await loadAChatSides(); // Loads a chat into sidebar2
-        return `chat/${path.split('/')[2]}`;  // Returns 'chat/:id'
+        await loadAChatSides(); 
+        return `chat/${path.split('/')[2]}`;  
     } else if (path === '/sign-up') {
         return 'sign-up';
+    } else if (path.startsWith('/a_profile/')) {
+        return `a_profile/${path.split('/')[2]}`;
+    } else if (path === '/search') {
+            return 'search';    
     } else if (path === '/chats') {
         return 'chats';
     } else if (path === '/log-in') {

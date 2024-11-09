@@ -4,8 +4,7 @@ export function render(user) {
     const userImageUrl = user.image_url || defaultImageUrl; // Set to user image or default
 
     return `
-        <div>
-            <h1>User Details</h1>
+        <div id="userDetails">
             <p><strong>Username:</strong> ${user.username}</p>
             <p><strong>Email:</strong> ${user.email}</p>
             <img src="${userImageUrl}" alt="User Image" style="max-width: 100px;" onerror="this.onerror=null; this.src='${defaultImageUrl}'">

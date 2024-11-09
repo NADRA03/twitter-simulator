@@ -8,6 +8,7 @@ import(
 	"database/sql"
 	"golang.org/x/crypto/bcrypt"
     "time"
+    "strings"
 )
 
 type User struct {
@@ -20,6 +21,7 @@ type User struct {
 	Gender    string         `json:"gender"`      // User's gender
 	Password  string         `json:"password"`    // User's password (hashed ideally)
 	ImageURL  sql.NullString  `json:"image_url"`   // Optional image URL for the user
+    BigImageURL sql.NullString `json:"big_image_url"` // Optional big image URL for the user
 	Role      string         `json:"role"`        // User's role (e.g., admin, user)
 	CreatedAt time.Time      `json:"created_at"`  // Timestamp for when the user was created  
 }
@@ -229,8 +231,8 @@ func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
     // Query the user details based on session's UserID
     var user User
-    err = db.QueryRow("SELECT id, username, email, image_url FROM Users WHERE id = ?", session.UserID).
-        Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL)
+    err = db.QueryRow("SELECT id, username, email, image_url, big_image_url FROM Users WHERE id = ?", session.UserID).
+        Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL, &user.BigImageURL)
     if err != nil {
         if err == sql.ErrNoRows {
             log.Println("UserDetailsHandler: User not found in database")
@@ -242,9 +244,73 @@ func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Check if ImageURL is valid and set it to an empty string if it is NULL
+    // Check if ImageURL and BigImageURL are valid, and set them to empty strings if NULL
     if !user.ImageURL.Valid {
-        user.ImageURL.String = "" // Set to empty string if NULL
+        user.ImageURL.String = ""
+    }
+    if !user.BigImageURL.Valid {
+        user.BigImageURL.String = ""
+    }
+
+    log.Printf("UserDetailsHandler: User details retrieved: %+v", user)
+
+    // Send the user details as JSON
+    w.Header().Set("Content-Type", "application/json")
+    if err := json.NewEncoder(w).Encode(user); err != nil {
+        log.Printf("UserDetailsHandler: Error encoding user data to JSON: %v", err)
+        http.Error(w, "error encoding JSON", http.StatusInternalServerError)
+    }
+}
+
+
+func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
+    log.Println("UserDetailsHandler: Profile is loading")
+
+    // Extract the userID from the URL path
+    path := r.URL.Path
+    // Split the URL path to get the user ID (assuming the URL structure is /a_profile/{id})
+    parts := strings.Split(path, "/")
+
+    // Ensure there are at least 3 parts in the path: ["", "a_profile", "{id}"]
+    if len(parts) < 3 {
+        log.Println("UserDetailsHandler: Invalid URL path")
+        http.Error(w, "invalid URL", http.StatusBadRequest)
+        return
+    }
+
+    // The ID should be the last part of the path
+    userID := parts[len(parts)-1]
+
+    // Check if userID is valid
+    if userID == "" {
+        log.Println("UserDetailsHandler: No user ID provided in URL path")
+        http.Error(w, "user ID is required", http.StatusBadRequest)
+        return
+    }
+
+    log.Printf("UserDetailsHandler: Retrieving details for UserID %s", userID)
+
+    // Query the user details based on the userID from the URL path
+    var user User
+    err := db.QueryRow("SELECT id, username, email, image_url, big_image_url FROM Users WHERE id = ?", userID).
+        Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL, &user.BigImageURL)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            log.Println("UserDetailsHandler: User not found in database")
+            http.Error(w, "user not found", http.StatusNotFound)
+            return
+        }
+        log.Printf("UserDetailsHandler: Error querying database: %v", err)
+        http.Error(w, "error querying database", http.StatusInternalServerError)
+        return
+    }
+
+    // Check if ImageURL and BigImageURL are valid, and set them to empty strings if NULL
+    if !user.ImageURL.Valid {
+        user.ImageURL.String = ""
+    }
+    if !user.BigImageURL.Valid {
+        user.BigImageURL.String = ""
     }
 
     log.Printf("UserDetailsHandler: User details retrieved: %+v", user)
