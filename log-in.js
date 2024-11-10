@@ -44,10 +44,11 @@ export function render() {
     <div class="login-and-signup">
         <svg class="logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" width="24px" height="24px" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><path d="M14.095479,10.316482L22.286354,1h-1.940718l-7.115352,8.087682L7.551414,1H1l8.589488,12.231093L1,23h1.940717  l7.509372-8.542861L16.448587,23H23L14.095479,10.316482z M11.436522,13.338465l-0.871624-1.218704l-6.924311-9.68815h2.981339  l5.58978,7.82155l0.867949,1.218704l7.26506,10.166271h-2.981339L11.436522,13.338465z"/></svg>
         <div class="nav">
-            <button id="goToLoginButton">Go to Login</button>
-            </br>
-            </br>
-            <button id="goToSignupButton">Go to Signup</button>
+            <h1 class="title">Happening now</h1>
+            <h1 class="title2">Join today.</h1>
+            <button id="goToSignupButton">Create account</button>
+            <h1 class="text"><span class="line"></span> or <span class="line"></span></h1>
+            <button id="goToLoginButton">Sign in</button>
         </div>
         
         <!-- Login Form -->
@@ -62,8 +63,6 @@ export function render() {
                     <label class="label">Password</label>
                     <input type="password" id="loginpassword" name="loginpassword" placeholder="Enter Your Password" required><br>
                     <button type="submit" id="loginButton">Log In</button><br>
-                    <label class="label">Don't Have an Account?</label>
-                    <button type="button" onclick="window.location.href='./sign-up'">Sign Up</button>
                 </form>
             </div>
         </section>

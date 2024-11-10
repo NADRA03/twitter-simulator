@@ -4,33 +4,46 @@
 
 /* Style the username heading */
 #username {
-    margin-top: 70px;
+    margin-top: 100px;
     margin-left: 160px;
-    font-size: 20px;
-    font-family: 'Bold'; 
+    font-size: 23px;
     color: white;
-
+    font-family: "Bold";
 }
 
 #name {
     margin-left: 160px;
     font-size: 20px;
-    color: #333;
+    color: rgb(113, 118, 123);
 }
 
+#followInfo {
+    margin-top: 100px;
+    margin-left: 160px;
+    color: rgb(113, 118, 123);
+}
+
+#followingCount{
+    margin-right: 20px;
+}
 
 /* Style the small profile image */
 #profileImage {
     position: absolute;
-    width: 120px; /* Increased size */
-    height: 120px; /* Increased size */
+    width: 160px; /* Increased size */
+    height: 160px; /* Increased size */
     border-radius: 50%;
-    border-width: 6px; /* Increased border width */
+    border-width: 5px; /* Increased border width */
     border-color: black;
     border-style: solid;
     margin-left: 160px;
-    bottom: 430px;
+    bottom: 410px;
     object-fit: cover;
+}
+
+.white-text {
+    color: white;
+    font-family: "Bold";
 }
 
 /* Style the larger profile image */
@@ -51,6 +64,21 @@
     font-size: 16px;
     text-align: center;
     margin-top: 20px;
+}
+
+#followButton {
+    margin-left: 740px;
+    position: fixed;
+    bottom: 440px;
+    width: auto;
+    border-radius: 30px; 
+    padding: 10px 20px;
+    height: auto;
+    border: 1px solid rgb(62, 65, 68);
+    background-color: black;
+    color: white;
+    font-family: "Bold";
+    font-size: 18px;
 }
 
 }

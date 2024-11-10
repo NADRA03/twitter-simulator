@@ -62,6 +62,11 @@ func main() {
 	http.HandleFunc("/chat_details", handler.GetChatDetailsHandler)
 	http.HandleFunc("/search-users", twitter.SearchUsers)
 	http.HandleFunc("/ws", handler.WebSocketHandler)
+	http.HandleFunc("/follow", twitter.AddFollowHandler)
+	http.HandleFunc("/followersCount", twitter.FollowersCountHandler)
+	http.HandleFunc("/followingCount", twitter.FollowingCountHandler)
+
+
 
 	http.Handle("/loader.js", http.FileServer(http.Dir(".")))
 	http.Handle("/search.js", http.FileServer(http.Dir(".")))
@@ -75,6 +80,7 @@ func main() {
     http.Handle("/a_profile.js", http.FileServer(http.Dir(".")))
 
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./fonts"))))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 	// Start the server on port 8080
 

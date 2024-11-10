@@ -3,16 +3,18 @@
     flex-direction: row; /* Arrange children in a row */
     align-items: center; /* Center items vertically */
     justify-content: space-between; /* Space out items evenly */
+    margin-top: 100px;
+    margin-left: 15%;
 
 #login-form,
 #signup-form  {
     position: absolute; /* Position it absolutely to the parent */
     top: 200px; /* Adjust according to your design */
     left: 50%; /* Center horizontally */
+    color: white;
     transform: translateX(-50%); /* Shift back by 50% of its width */
     width: 300px; /* Set a fixed width for the form */
-    background: white; /* Add background for better visibility */
-    border: 1px solid #ccc; /* Optional: Add a border */
+    background: black; /* Add background for better visibility */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for depth */
     padding: 20px; /* Optional: Add padding */
     z-index: 1000; /* Ensure it appears above other content */
@@ -21,10 +23,12 @@
 }
 
 .logo{
-    margin-right: 400px;
-    width: 400px; /* Example width */
-    height: 400px; /* Example height */
+    width: 500px; /* Example width */
+    height: 500px; /* Example height */
     fill: white; /* Example color */
+    margin-bottom: 150px;
+    margin-right: 300px;
+    margin-left: 200px;
 }
 
 /* Close Button Styles */
@@ -46,6 +50,15 @@
     text-align: center; /* Center the heading */
 }
 
+.title {
+    font-size: 70px;
+    font-family: "Heavy";
+}
+
+.title2 {
+    font-family: "Heavy";
+    margin-bottom: 50px;
+}
 /* Labels */
 .label {
     display: block; /* Block display to have full width */
@@ -101,20 +114,35 @@ button[type="button"]:hover {
 
 #goToLoginButton,
 #goToSignupButton {
-    background-color: #007bff; /* Primary color */
+    background-color: #1DA1F2; /* Primary color */
     color: white; /* Text color */
     padding: 10px 20px; /* Vertical and horizontal padding */
+    width: 280px;
     border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners */
+    border-radius: 30px; /* Rounded corners */
     font-size: 16px; /* Font size */
     cursor: pointer; /* Change cursor to pointer on hover */
     transition: background-color 0.3s, transform 0.2s; /* Transition effects */
     margin-right: 500px;
+    padding: 12px;
+    font-family: "Bold";
+    margin-bottom: 15px;
 }
+
+#goToLoginButton {
+    background-color: black; /* Primary color */
+    color: #1DA1F2; /* Text color */
+    border: 1px solid rgb(62, 65, 68); /* Border matching the text color */
+    margin-top: 10px;
+}
+
+#goToSignupButton {
+    margin-top: 10px;
+}
+
 
 #goToLoginButton:hover, 
 #goToSignupButton:hover {
-    background-color: #0056b3; /* Darker shade for hover */
     transform: scale(1.05); /* Slightly enlarge button */
 }
 
@@ -123,5 +151,22 @@ button[type="button"]:hover {
     outline: none; /* Remove default focus outline */
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add shadow on focus */
 }
+
+.nav {
+    margin-bottom: 200px;
+}
+
+.text {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+  }
+  
+  .line {
+    flex: 0.16;
+    height: 1px;
+    background-color: rgb(62, 65, 68);
+    margin: 0 5px;
+  }
 
 }

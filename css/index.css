@@ -76,9 +76,26 @@ body {
     border-left: 1px solid rgb(62, 65, 68); 
 }
 
+
+
 body.login-page .sidebar-left ,
 body.login-page .sidebar-right {
     display: none; /* or other styles to deactivate */
     border: none;
     width: 0%; 
 }
+
+.sidebar-section {
+    border: 1px solid rgb(62, 65, 68);
+    margin-bottom: 30px;
+    border-radius: 20px;
+    padding: 0px 20px;
+    width: 80%;
+}
+
+h2 {
+    font-family: "Heavy";
+    font-size: 22px;
+}
+
+
