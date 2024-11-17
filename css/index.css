@@ -1,0 +1,85 @@
+@font-face {
+    font-family: 'Regular'; /* Assign a name here */
+    src: url("../fonts/Chirp-Regular.ttf") format('truetype'); /* Path to the font file */
+}
+
+@font-face {
+    font-family: 'Heavy'; /* Assign a name here */
+    src: url("../fonts/Chirp-Heavy.ttf") format('truetype'); /* Path to the font file */
+}
+
+@font-face {
+    font-family: 'Bold'; /* Assign a name here */
+    src: url("../fonts/Chirp-Bold.ttf") format('truetype'); /* Path to the font file */
+}
+
+@font-face {
+    font-family: 'Medium'; /* Assign a name here */
+    src: url("../fonts/Chirp-Medium.ttf") format('truetype'); /* Path to the font file */
+}
+
+body {
+    background-color: #000000; 
+    font-family: 'Regular'; 
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    color: white;
+}
+
+#app {
+    width: 50%;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar-right {
+    width: 25%; /* Set a fixed width for the left sidebar */
+    background-color: #000000; /* Optional background color */
+    padding: 15px; /* Optional padding */
+    position: fixed; /* Fix to the left */
+    left: 0;
+    top: 0;
+    bottom: 0; /* Extend to the bottom of the viewport */
+    border-right: 1px solid rgb(62, 65, 68); /* Grey line on the left */
+
+    .logo{
+        margin-left: 30%;
+        width: 40px; /* Example width */
+        height: 40px; /* Example height */
+        fill: white; /* Example color */
+    }
+    
+    .nav1{
+        margin-left: 30%;
+        height: 100%; 
+        padding-top: 50px;
+        ul {
+            list-style-type: none; /* Remove bullets */
+            padding: 0;           /* Remove default padding */
+            margin: 0;           /* Remove default margin */
+        }   
+    }
+}
+
+.sidebar-left {
+    width: 25%; /* Set a fixed width for the right sidebar */
+    background-color: #000000; /* Optional background color */
+    padding: 15px; /* Optional padding */
+    position: fixed; /* Fix to the right */
+    right: 0;
+    top: 0;
+    bottom: 0; /* Extend to the bottom of the viewport */
+    border-left: 1px solid rgb(62, 65, 68); 
+}
+
+body.login-page .sidebar-left ,
+body.login-page .sidebar-right {
+    display: none; /* or other styles to deactivate */
+    border: none;
+    width: 0%; 
+}
