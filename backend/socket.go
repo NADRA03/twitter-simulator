@@ -31,6 +31,7 @@ func NewChatsHandler() *ChatsHandler {
 				return false
 			},
 		},
+		onlineUsers: make(map[int]bool),
 	}
 }
 
@@ -114,6 +115,7 @@ func (h *ChatsHandler) WebSocketHandler(w http.ResponseWriter, r *http.Request) 
 	// Step 5: Register connection in handler and start listening for messages
 	h.mutex.Lock()
 	h.connections[conn] = chatID
+	h.onlineUsers[userID] = true 
 	h.mutex.Unlock()
 	fmt.Println("Connection registered with chat ID:", chatID)
 
@@ -151,6 +153,7 @@ func (h *ChatsHandler) listenForMessages(conn *websocket.Conn, userID int) error
 		fmt.Println("Closing connection in listenForMessages for userID:", userID)
 		h.mutex.Lock()
 		delete(h.connections, conn)
+		h.onlineUsers[userID] = false
 		h.mutex.Unlock()
 		conn.Close()
 	}()
@@ -202,6 +205,37 @@ func (h *ChatsHandler) IsUserInChat(userID, chatID int) bool {
 	return exists
 }
 
+func (h *ChatsHandler) IsUserOnline(userID int) bool {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	return h.onlineUsers[userID]
+}
+
+// GetUserStatus returns the online status of a user
+func (h *ChatsHandler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
+    // Parse userID from the query parameters
+    userIDStr := r.URL.Query().Get("userID")
+    if userIDStr == "" {
+        http.Error(w, "////////userID is required", http.StatusBadRequest)
+        return
+    }
+
+    userID, err := strconv.Atoi(userIDStr)
+    if err != nil {
+        http.Error(w, "//////////Invalid userID", http.StatusBadRequest)
+        return
+    }
+
+    // Get the user status
+    status := "Offline"
+    if h.IsUserOnline(userID) {
+        status = "Online"
+    }
+
+    // Send the status as a response
+	fmt.Println("///////////"+status)
+    w.Write([]byte(status))
+}
 // logError logs the error with a function name for context
 func logError(funcName string, err error) {
 	log.Printf("Error in %s: %v\n", funcName, err)

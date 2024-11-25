@@ -7,9 +7,12 @@ export async function loadSidebar() {
     try {
         const sidebarModule = await import('./sidebar.js');
         sidebar.innerHTML = sidebarModule.render();
+        // sidebarModule.initialize();
+
 
         const sidebar2Module = await import('./sidebar2.js');
         sidebar2.innerHTML = sidebar2Module.render();
+        // sidebar2Module.initialize();
     } catch (error) {
         console.error('Error loading sidebar modules:', error);
     }

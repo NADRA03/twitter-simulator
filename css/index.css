@@ -45,7 +45,12 @@ body {
     top: 0;
     bottom: 0; /* Extend to the bottom of the viewport */
     border-right: 1px solid rgb(62, 65, 68); /* Grey line on the left */
-
+    h1 {
+        all: unset; /* Reset all inherited and default styles */
+    }
+    a {
+        all: unset;
+    }
     .logo{
         margin-left: 30%;
         width: 40px; /* Example width */
@@ -62,6 +67,9 @@ body {
             padding: 0;           /* Remove default padding */
             margin: 0;           /* Remove default margin */
         }   
+        li {
+            margin-bottom: 20px;
+        }
     }
 }
 
@@ -91,6 +99,16 @@ body.login-page .sidebar-right {
     border-radius: 20px;
     padding: 0px 20px;
     width: 80%;
+
+     ul {
+        color: rgb(62, 65, 68);
+        list-style: none; /* Remove the default list markers (bullets or numbers) */
+        padding: 0; /* Remove default padding */
+        margin: 0; /* Remove default margin */
+        padding-bottom: 20px;
+        text-align: center;
+    }
+    
 }
 
 h2 {

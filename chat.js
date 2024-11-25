@@ -11,15 +11,56 @@ function populateUserLookup(users) {
     userLookup = users.reduce((lookup, user) => {
         lookup[user.id] = {
             username: user.username,
-            imageUrl: user.image_url ? user.image_url.String : 'placeholder-image-url.jpg'
+            imageUrl: user.image_url ? user.image_url.String : '/assets/user.svg',
+            onlineStatus: 'Offline'
         };
         return lookup;
     }, {});
 }
 
+// Function to fetch online status for each user
+function fetchOnlineStatus() {
+    const statusPromises = globalUsers.map(async (user) => {
+        try {
+            const response = await fetch(`/online-status?userID=${user.id}`);
+            const status = await response.text(); // Expecting "Online" or "Offline"
+            userLookup[user.id].onlineStatus = status;
+        } catch (error) {
+            console.error(`Error fetching online status for user ${user.id}:`, error);
+        }
+    });
+    Promise.all(statusPromises);
+}
+
+function updateUserList() {
+    const userListHTML = globalUsers.map(user => `
+        <div class="user-item">
+            <img src="${user.image_url.String || '/assets/user.svg'}" alt="${user.username}'s profile picture" class="user-image" />
+            <span class="user-name">${user.username}</span>
+            <span class="user-status ${userLookup[user.id].onlineStatus === 'Online' ? 'online' : 'offline'}">
+                ${userLookup[user.id].onlineStatus}
+            </span>
+        </div>
+    `).join('');
+
+    document.getElementById("userList").innerHTML = userListHTML;
+}
+
+// Function to periodically fetch online status and update user list
+function startUserStatusUpdate() {
+    fetchOnlineStatus();
+    updateUserList(); 
+
+    setInterval(async () => {
+        fetchOnlineStatus();
+        updateUserList();
+    }, 15000); 
+}
+
+
 export function render(chatId) {
     const uniqueMessageIds = new Set();
-
+    
     const uniqueMessages = globalMessages.filter(message => {
         if (uniqueMessageIds.has(message.message_id)) {
             return false;
@@ -30,7 +71,7 @@ export function render(chatId) {
 
     // Create a promise array for checking user details for all messages
     const messagePromises = uniqueMessages.map(async (message) => {
-        const user = userLookup[message.user_id] || { username: 'Unknown', imageUrl: 'placeholder-image-url.jpg' };
+        const user = userLookup[message.user_id] || { username: 'Unknown', imageUrl: '/assets/user.svg' };
         
         // Call fetchUserDetails to check if the message should go to the right
         const isCurrentUserMessage = await fetchUserDetails(message.user_id);
@@ -38,7 +79,7 @@ export function render(chatId) {
         // Create the message element
         const messageElement = `
             <div class="message-item ${isCurrentUserMessage ? 'right' : ''}">
-                <img src="${user.imageUrl}" class="user-image" />
+                <img src="${user.imageUrl || '/assets/user.svg'}"  class="user-image" />
                 <span class="message-username">${user.username}:</span>
                 <span class="message-text">${message.message_text.String}</span>
                 ${message.image_url ? `<img src="${message.image_url.String}" class="message-image" />` : ''}
@@ -84,8 +125,11 @@ export function render(chatId) {
                     <h3>Participants</h3>
                     ${globalUsers.map(user => `
                         <div class="user-item">
-                            <img src="${user.image_url.String || 'placeholder-image-url.jpg'}" alt="${user.username}'s profile picture" class="user-image" />
+                            <img src="${user.image_url.String || '/assets/user.svg'}" alt="${user.username}'s profile picture" class="user-image" />
                             <span class="user-name">${user.username}</span>
+                            <span class="user-status ${userLookup[user.id].onlineStatus === 'Online' ? 'online' : 'offline'}">
+                                ${userLookup[user.id].onlineStatus}
+                            </span>
                         </div>
                     `).join('')}
                 </div>
@@ -127,12 +171,12 @@ async function displayMessage(messageData) {
     displayedMessageIds.add(messageData.message_id);
 
     const chatMessages = document.getElementById("chatMessages");
-    const user = userLookup[messageData.user_id] || { username: 'Unknown', imageUrl: 'placeholder-image-url.jpg' };
+    const user = userLookup[messageData.user_id] || { username: 'Unknown', imageUrl: '/assets/user.svg' };
 
     const messageElement = document.createElement("div");
     messageElement.className = "message-item";
     messageElement.innerHTML = `
-        <img src="${user.imageUrl}" class="user-image" />
+        <img src="${user.imageUrl || '/assets/user.svg'}"  class="user-image" />
         <span class="message-username">${user.username}:</span>
         <span class="message-text">${messageData.message_text}</span>
         ${messageData.image_url ? `<img src="${messageData.image_url}" alt="Attached image" class="message-image" />` : ''}
@@ -335,7 +379,7 @@ function inviteUserToChat(userId) {
     .catch(error => console.error('Fetch error:', error));
 }
 
-function fetchChatDetails(chatId) {
+async function fetchChatDetails(chatId) {
     return fetch(`/chat_details?chat_id=${chatId}`)
         .then(response => {
             if (!response.ok) {
@@ -348,6 +392,7 @@ function fetchChatDetails(chatId) {
             globalUsers = data.users;
             globalMessages = data.messages;
             populateUserLookup(globalUsers); // Populate user lookup here
+            fetchOnlineStatus(); 
         })
         .catch(error => {
             console.error('Error fetching chat details:', error);
@@ -367,6 +412,8 @@ export function initialize(chatIdParam) {
         console.log("Users:", globalUsers);
         console.log("Messages:", globalMessages);
     });
+
+    startUserStatusUpdate();
     
     const sendMessageBtn = document.getElementById("sendMessageBtn");
     if (sendMessageBtn) {

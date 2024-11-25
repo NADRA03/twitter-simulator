@@ -9,7 +9,7 @@
 #login-form,
 #signup-form  {
     position: absolute; /* Position it absolutely to the parent */
-    top: 200px; /* Adjust according to your design */
+    top: 50px; /* Adjust according to your design */
     left: 50%; /* Center horizontally */
     color: white;
     transform: translateX(-50%); /* Shift back by 50% of its width */
@@ -19,7 +19,7 @@
     padding: 20px; /* Optional: Add padding */
     z-index: 1000; /* Ensure it appears above other content */
     display: none; /* Keep it hidden initially */
-    border-radius: 8px; /* Rounded corners */
+    border: 1px solid rgb(62, 65, 68);
 }
 
 .logo{
@@ -33,21 +33,31 @@
 
 /* Close Button Styles */
 #closeLoginForm {
+    background-color: transparent;
     position: absolute; /* Position it absolutely within the form */
-    top: 10px; /* Align it at the top */
-    right: 10px; /* Align it to the right */
     background: none; /* No background */
     border: none; /* No border */
     font-size: 16px; /* Font size for the close button */
     cursor: pointer; /* Change cursor to pointer */
-    color: #888; /* Color for the close button */
+    color: rgb(62, 65, 68); /* Color for the close button */
+}
+
+#closeSignupForm {
+    background-color: transparent;
+    position: absolute; /* Position it absolutely within the form */
+    background: none; /* No background */
+    border: none; /* No border */
+    font-size: 16px; /* Font size for the close button */
+    cursor: pointer; /* Change cursor to pointer */
+    color: rgb(62, 65, 68); /* Color for the close button */
 }
 
 /* Form Header */
 .h1 {
-    font-size: 24px; /* Font size for the heading */
+    font-size: 30px; /* Font size for the heading */
     margin-bottom: 15px; /* Space below the heading */
     text-align: center; /* Center the heading */
+    font-family: "Heavy";
 }
 
 .title {
@@ -63,35 +73,46 @@
 .label {
     display: block; /* Block display to have full width */
     margin-bottom: 5px; /* Space below the label */
-    font-weight: bold; /* Bold text */
+    font-family: "Regular";
+    font-size: 16px;
 }
 
+#username-label {
+margin-top: 30px;
+}
+
+
 /* Input Fields */
-input[type="text"],
-input[type="password"] {
+input {
     width: 100%; /* Full width for input fields */
     padding: 10px; /* Padding inside the input */
     margin-bottom: 15px; /* Space below the input */
-    border: 1px solid #ccc; /* Border for the input */
-    border-radius: 4px; /* Rounded corners */
+    border: none; /* Remove the default border */
     box-sizing: border-box; /* Include padding in the width calculation */
+    background-color: black !important; /* Set background color */
+    color: white; /* Ensure text is visible on the black background */
+    outline: none; /* Remove the default focus outline */
+}
+
+/* Styling for the input field when it gains focus */
+input:focus {
+    outline: none; /* Prevent the browser's default outline */
+    border-bottom: 1px solid gray; /* Optional: Add a custom border when focused */
 }
 
 /* Submit Button */
-#loginButton {
+#loginButton,
+#signupButton {
     width: 100%; /* Full width for the button */
     padding: 10px; /* Padding for the button */
-    background-color: #007bff; /* Primary color for the button */
+    background-color: transparent; /* Primary color for the button */
     color: white; /* White text color */
     border: none; /* No border */
-    border-radius: 4px; /* Rounded corners */
+    border-radius: 30px; /* Rounded corners */
     cursor: pointer; /* Change cursor to pointer */
-    font-size: 16px; /* Font size */
-}
-
-/* Button Hover Effect */
-#loginButton:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    font-size: 25px; /* Font size */
+    margin-top: 10px;
+    font-family: "Heavy";
 }
 
 /* Sign Up Button */

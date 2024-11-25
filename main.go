@@ -62,9 +62,11 @@ func main() {
 	http.HandleFunc("/chat_details", handler.GetChatDetailsHandler)
 	http.HandleFunc("/search-users", twitter.SearchUsers)
 	http.HandleFunc("/ws", handler.WebSocketHandler)
+	http.HandleFunc("/online-status",handler.GetUserStatus)
 	http.HandleFunc("/follow", twitter.AddFollowHandler)
 	http.HandleFunc("/followersCount", twitter.FollowersCountHandler)
 	http.HandleFunc("/followingCount", twitter.FollowingCountHandler)
+	http.HandleFunc("/top-followed-ids", twitter.TopFollowedUserIDsHandler)
 
 
 

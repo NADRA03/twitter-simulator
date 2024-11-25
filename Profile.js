@@ -1,13 +1,17 @@
 // Renders user details dynamically
 export function render(user) {
-    const defaultImageUrl = 'https://i.abcnewsfe.com/a/7d5c53c5-f5a7-40a6-9c99-648316b9f7a2/Elon-Musk-1-rt-jm-241016_1729107345064_hpMain.jpg'; 
+    const defaultImageUrl = '/assets/user.png'; 
     const userImageUrl = user.image_url || defaultImageUrl; // Set to user image or default
-
+    const defaultCoverUrl = "/assets/wallpaper.png";
+    const userBigImageUrl = user.big_image_url || defaultCoverUrl;
     return `
         <div id="userDetails">
-            <p><strong>Username:</strong> ${user.username}</p>
-            <p><strong>Email:</strong> ${user.email}</p>
-            <img src="${userImageUrl}" alt="User Image" style="max-width: 100px;" onerror="this.onerror=null; this.src='${defaultImageUrl}'">
+            <div>
+            <img id="bigImage" src="${userBigImageUrl}" onError="this.onerror=null; this.src='${defaultCoverUrl}'" />
+            <h2 id="username"> ${user.username}</h2>
+            <h2 id="name">${user.FirstName} ${user.LastName}</h2>
+            <img id="profileImage" src="${userImageUrl}" alt="User Image" onerror="this.onerror=null; this.src='${defaultImageUrl}'">
+            </div>
         </div>
     `;
 }

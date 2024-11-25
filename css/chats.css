@@ -51,12 +51,8 @@ button:hover {
 
 #chatList li {
     background-color: black;
-    border: 1px solid rgb(62, 65, 68);
     border-radius: 0px;
-    position: relative;
     padding: 10px;
-    margin: 5px 0;
-    width: 100%;
     transition: background-color 0.2s ease;
 }
 

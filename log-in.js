@@ -54,11 +54,10 @@ export function render() {
         <!-- Login Form -->
         <section id="login-form" style="display: none;">  
             <div class="login">
-                <button id="closeLoginForm" style="position: absolute; top: 10px; right: 10px;">✖</button>
+                <button id="closeLoginForm" style="position: absolute; top: 10px; left: 10px;">✖</button>
                 <form class="form" id="loginForm" action="/log-in" method="post">
                     <input type="hidden" name="form" value="login">
-                    <h1 class="h1">Log In</h1>
-                    <label class="label">Username</label>
+                    <label id="username-label" class="label">Username</label>
                     <input type="text" id="loginusername" name="loginusername" placeholder="Enter Your Username" required><br>
                     <label class="label">Password</label>
                     <input type="password" id="loginpassword" name="loginpassword" placeholder="Enter Your Password" required><br>
@@ -70,11 +69,10 @@ export function render() {
         <!-- Signup Form -->
         <section id="signup-form" style="display: none;">
             <div class="signup">
-                <button id="closeSignupForm" style="position: absolute; top: 10px; right: 10px;">✖</button>
+                <button id="closeSignupForm" style="position: absolute; top: 10px; left: 10px;">✖</button>
                 <form action="/log-in/create-account" method="post">
                     <input type="hidden" name="form" value="signup">
-                    <h1 class="h1">Sign Up</h1>
-                    <label class="label">Username</label>
+                    <label id="username-label" class="label">Username</label>
                     <input type="text" id="username" name="username" placeholder="Enter Your Username" required><br>
                     <label class="label">Email</label>
                     <input type="email" id="email" name="email" placeholder="Enter Your Email" required><br>

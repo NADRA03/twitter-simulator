@@ -42,7 +42,8 @@ type Message struct {
 type ChatsHandler struct{
 	connections map[*websocket.Conn]int // WebSocket connections and their associated chat IDs
 	mutex       sync.Mutex
-	upgrader    websocket.Upgrader
+	upgrader    websocket.Upgrader  
+    onlineUsers map[int]bool  
 }
 
 // CreateChatHandler handles the creation of a new chat
