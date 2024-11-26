@@ -1,6 +1,6 @@
 // Renders user details dynamically
 export function render(user) {
-    const defaultImageUrl = '/assets/user.png'; 
+    const defaultImageUrl = '/assets/user.svg'; 
     const userImageUrl = user.image_url || defaultImageUrl; // Set to user image or default
     const defaultCoverUrl = "/assets/wallpaper.png";
     const userBigImageUrl = user.big_image_url || defaultCoverUrl;

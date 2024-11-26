@@ -1,21 +1,21 @@
 @font-face {
     font-family: 'Regular'; /* Assign a name here */
-    src: url("../fonts/Chirp-Regular.ttf") format('truetype'); /* Path to the font file */
+    src: url("../fonts/new.ttf") format('truetype'); /* Path to the font file */
 }
 
 @font-face {
     font-family: 'Heavy'; /* Assign a name here */
-    src: url("../fonts/Chirp-Heavy.ttf") format('truetype'); /* Path to the font file */
+    src: url("../fonts/new.ttf") format('truetype'); /* Path to the font file */
 }
 
 @font-face {
     font-family: 'Bold'; /* Assign a name here */
-    src: url("../fonts/Chirp-Bold.ttf") format('truetype'); /* Path to the font file */
+    src: url("../fonts/new.ttf") format('truetype'); /* Path to the font file */
 }
 
 @font-face {
     font-family: 'Medium'; /* Assign a name here */
-    src: url("../fonts/Chirp-Medium.ttf") format('truetype'); /* Path to the font file */
+    src: url("../fonts/new.ttf") format('truetype'); /* Path to the font file */
 }
 
 body {
@@ -50,11 +50,12 @@ body {
     }
     a {
         all: unset;
+        font-size: 30px;
     }
     .logo{
         margin-left: 30%;
-        width: 40px; /* Example width */
-        height: 40px; /* Example height */
+        width: 150px; /* Example width */
+        height: 150px; /* Example height */
         fill: white; /* Example color */
     }
     
@@ -69,6 +70,7 @@ body {
         }   
         li {
             margin-bottom: 20px;
+            padding-bottom: 30px;
         }
     }
 }

@@ -13,6 +13,7 @@
     margin: 0 auto; 
     color: white;
     background-color: black;
+    font-family: "Regular";
 
     #chatMessages {
         flex: 1; 
@@ -42,14 +43,15 @@
     background-color: #4CAF50;
     color: white;
     cursor: pointer;
+    position: relative;
+    top: 5px;
     border-radius: 0 5px 5px 0;
-    font-weight: bold;
     margin-bottom: 20px;
+    font-family: "Regular";
+    font-size: 35px;
+    background-color: transparent;
 }
 
-#sendMessageBtn:hover {
-    background-color: #45a049;
-}
 
  input, button {
     box-sizing: border-box;
@@ -65,25 +67,29 @@
     padding: 5px 10px;
     cursor: pointer;
     border-radius: 5px;
+
+    img {
+        width: 50px;
+        height: 50px;
+    }
 }
 
 #addPeopleButton {
     background-color: #4CAF50; /* Bootstrap primary color */
     color: white;
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-weight: bold;
     margin-top: 10px; /* Space above the button */
     transition: background-color 0.3s; /* Smooth background transition */
+    font-family: "Regular";
+    font-size: 30px;
+    background-color: transparent;
+
 }
 
-/* Hover effect for Add People button */
-#addPeopleButton:hover {
-    background-color: #4CAF50; /* Darker shade for hover effect */
-}
 
 /* Styles for the Confirm Add People button */
 #confirmAddPeopleBtn {
@@ -191,8 +197,8 @@ button {
 }
 
 #chatMessages .message-item .user-image {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     margin-right: 10px;
 }

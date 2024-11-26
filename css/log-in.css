@@ -23,10 +23,10 @@
 }
 
 .logo{
-    width: 500px; /* Example width */
-    height: 500px; /* Example height */
+    width: 600px; /* Example width */
+    height: 600px; /* Example height */
     fill: white; /* Example color */
-    margin-bottom: 150px;
+    margin-bottom: 130px;
     margin-right: 300px;
     margin-left: 200px;
 }

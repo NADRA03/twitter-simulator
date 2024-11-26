@@ -75,6 +75,7 @@ button:hover {
     flex-direction: row; /* Arrange children in a row */
     align-items: center; /* Center items vertically */
     justify-content: center; /* Space out items evenly */
+    width: 500px;
 
     .chat-button {
         background-color: transparent;
@@ -119,8 +120,25 @@ button:hover {
 }
 
 #showChatFormButton {
+    left: 520px;
+    top: 10px;
     position: relative;
-    font-weight: 300;
+    font-size: 30px;
+    font-family: "Regular";
     background-color: transparent;
+}
+
+.chat-image {
+    position: relative;
+    right: 120px;
+    width:  100px;
+    height: 100px;
+    bottom: 20px;
+}
+
+.chat-details {
+    position: relative;
+    right: 160px;
+    bottom: 15px;
 }
 }

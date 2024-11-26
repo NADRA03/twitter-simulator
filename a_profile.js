@@ -19,7 +19,7 @@ export async function initialize(Id) {
         const user = await response.json();
 
         // Default image URL if no image is provided
-        const defaultImageUrl = "/assets/user.png";
+        const defaultImageUrl = "/assets/user.svg";
         const defaultCoverUrl = "/assets/wallpaper.png";
 
         // Use the default image if no image URL is found

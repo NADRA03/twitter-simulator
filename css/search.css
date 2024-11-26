@@ -18,12 +18,14 @@
     height: 27px;
     border-radius: 30px; /* Rounded corners */
     background-color: rgb(32, 33, 36);
+    font-family: "Regular";
 }
 
 #searchInput:focus, #searchInput:hover {
     background-color: black;
     border-color: rgb(29, 155, 240) ;/* New border color */
     outline: none; /* Remove the default outline */
+    font-family: "Regular";
 }
 
 .search-type-buttons{
@@ -31,8 +33,7 @@
     margin-left: 27%;
     height: auto;
     border-bottom: 2px solid grey; /* Add a grey border underneath */
-
-
+    font-family: "Regular";
 }
 
 .search-type-buttons button {
@@ -47,6 +48,7 @@
     height: 50px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-family: "Regular";
 }
 
 .search-type-buttons button.active {
@@ -56,6 +58,7 @@
     background-position: bottom;
     background-repeat: no-repeat;
     background-size: 100% 4px; /* Height of the border */
+    font-family: "Regular";
 }
 
 .search-type-buttons button:hover {
@@ -68,12 +71,13 @@
     display: flex;
     align-items: center;
     margin-left: 30%;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 .user img {
     margin-right: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
+    width: 60px;
+    height: 60px;
     cursor: pointer;
 }
 

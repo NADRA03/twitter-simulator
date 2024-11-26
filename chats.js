@@ -86,6 +86,7 @@ async function fetchUserChats() {
             chatItem.innerHTML = `
             <button class="chat-button" data-chat-id="${chat.chat_id}">
                 <img src="${chat.image}" alt="${chat.name}" class="chat-image" 
+                onerror="this.onerror=null; this.src='./assets/logo.svg';"
                 />
             </button>
             <div class="chat-details">

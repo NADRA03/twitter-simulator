@@ -101,7 +101,7 @@ export function render(chatId) {
 
     return `
         <div class="chatContainer">
-            <button id="infoButton" class="info-button">Info</button>
+            <button id="infoButton" class="info-button"><img src="/assets/info.svg"  class="user-image" /></button>
             <div id="chatMessages">
                 ${uniqueMessages.length > 0 ? '' : '<p>No messages yet.</p>'}
             </div>
@@ -302,11 +302,11 @@ function displaySearchResults(users) {
     }
 
     users.forEach((user) => {
-        const userElement = document.createElement("div");
+        const userElement = document.createElement("div");     ////////////////////
         userElement.className = "user";
         userElement.innerHTML = `
             <br>
-            <img src="${user.image_url}" style="width: 40px; height: 40px; border-radius: 20px; cursor: pointer;"/> 
+            <img src="${user.image_url || '/assets/user.svg'}" style="width: 40px; height: 40px; border-radius: 20px; cursor: pointer;"   onerror="this.onerror=null; this.src='./assets/user.svg';"/> 
             <span style="cursor: pointer;">${user.username}</span>
         `;
 
