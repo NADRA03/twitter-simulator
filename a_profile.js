@@ -45,7 +45,7 @@ export async function initialize(Id) {
                 <h2 id="username">${user.username}</h2>
                 <h2 id="name">${user.FirstName} ${user.LastName}</h2>
                 <img id="profileImage" src="${userImageUrl}" onError="this.onerror=null; this.src='${defaultImageUrl}'" />
-
+                <img id="direct" src="/assets/direct.svg"  />
                 <div id="followInfo">
             <span id="followingCount"><span class="white-text">${followingCount}</span> Following</span>
             <span id="followersCount"><span class="white-text" id="followersCountText">${followersCount}</span> Followers</span>

@@ -66,6 +66,17 @@
     margin-top: 20px;
 }
 
+#direct {
+    position: absolute;
+    width: 30px; /* Increased size */
+    height: 30px; /* Increased size */
+    margin-left: 680px;
+    bottom: 445px;
+
+
+}
+
+
 #followButton {
     margin-left: 740px;
     position: fixed;

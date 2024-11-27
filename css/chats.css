@@ -107,6 +107,7 @@ button:hover {
     z-index: 1000; /* Ensure it appears above other content */
     display: none; /* Keep it hidden initially */
     border-radius: 0px; /* Rounded corners */
+    align-items: center;
 
     #closeChatFormButton {
         background: none;
@@ -140,5 +141,13 @@ button:hover {
     position: relative;
     right: 160px;
     bottom: 15px;
+}
+
+#createChatButton {
+    font-size: 30px;
+    font-family: "Regular";
+    position: relative;
+    top: 25px;
+    margin-left: 20%;
 }
 }
