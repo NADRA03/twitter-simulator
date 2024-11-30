@@ -1,3 +1,7 @@
+.main-content {
+    display: flex;
+    justify-content: center;
+    padding: 20px; /* Adjusted to provide space */
 
 
 header {
@@ -39,12 +43,6 @@ button {
 
 button:hover {
     background-color: #e9cdf6;
-}
-
-.main-content {
-    display: flex;
-    justify-content: center;
-    padding: 20px; /* Adjusted to provide space */
 }
 
 .post-container {
@@ -126,4 +124,6 @@ footer {
     bottom: 0;
     width: 100%;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
 }

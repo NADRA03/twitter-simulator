@@ -1,5 +1,4 @@
 
-
 /* Post Comments Content */
 .post-comments-content {
     background-color: #fff;
@@ -7,7 +6,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 20px;
-}
+
 
 /* Individual Comment Post */
 .com-post {
@@ -133,4 +132,6 @@
     .adding-com button {
         font-size: 0.9em;
     }
+}
+
 }

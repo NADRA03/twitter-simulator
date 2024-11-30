@@ -1,135 +1,126 @@
+.form-and-sidebar-container {
 
-/* Post Comments Content */
-.post-comments-content {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 20px;
+button {
+    background-color: #00072D; /* Blue background color for buttons */
+    color: #fff; /* White text color */
+    border: none; /* Remove default border */
+    padding: 10px 20px; /* Padding inside the buttons */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 0.9em; /* Slightly smaller font size for buttons */
+    cursor: pointer; /* Pointer cursor on hover */
+    display: inline-flex;
+    align-items: center; /* Center the icon and text vertically */
+    justify-content: center; /* Center the icon and text horizontally */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transition effects */
 }
-
-/* Individual Comment Post */
-.com-post {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fafafa;
+button:hover {
+   
+    transform: scale(1.05); /* Slightly scale up the button on hover */
 }
-
-/* Meta Information */
-.mainPostCardMeta {
+button i {
+    margin-right: 5px; /* Space between icon and text */
+}
+.navigation-buttonsm {
+    margin-top: 20px; /* Space above the navigation buttons */
+}
+.creatingcontainer {
+   
+    width: 100%;
+    height: 100%;
+}
+/* Specific form class */
+.create-post-form {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+    width: 100%;
+    height: 100%;
 }
+    width: 100%; /* Ensure it takes full width */
+    height: 100vh; /* Make it take full viewport height */
+   
+    padding: 0; /* Remove default padding */
+    margin-top: 10%;
 
-.mainPostCardUsername {
-    font-weight: bold;
-    color: #007bff;
-}
-
-.post-date {
-    font-size: 0.9em;
-    color: #666;
-}
-
-/* Post Title */
-.mainPostCardTitle {
-    font-size: 1.5em;
-    margin: 10px 0;
-}
-
-/* Post Content */
-.mainPostCardText {
-    font-size: 1em;
-    line-height: 1.5;
-}
-
-/* Interaction Section */
-.interact {
-    margin-top: 10px;
-    cursor: pointer;
-    color: #007bff;
-}
-
-.interact h4 {
-    display: inline;
-}
-
-/* Comments Section */
-.bluetrial {
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px solid #e0e0e0;
-}
-
-.com-post-main {
-    margin-bottom: 10px;
+/* Sidebar */
+.sidebar {
+    
+    width: 25%; /* Adjust as needed */
     padding: 10px;
-    border-left: 3px solid #007bff;
-    background-color: #f9f9f9;
+    border-right: 1px solid #ddd;
+    margin-left: 5px; 
+    flex-shrink: 0; /* Prevent the sidebar from shrinking */
+    display: flex; /* Ensures items are aligned vertically */
+    flex-direction: column; /* Stacks items vertically */
 }
-
-.comment-content-log {
-    margin: 5px 0;
+/* Main content area */
+.main-creating {
+    width: 70%; /* Adjust as needed */
+    padding: 20px;
+   
+    display: flex;
+    flex-direction: column; /* Ensure content inside is stacked vertically */
+    flex-shrink: 0; /* Prevent the sidebar from shrinking */
 }
-
-/* Add Comment Form */
-.adding-com {
-    margin-top: 20px;
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
 }
-
-.adding-com label {
+.form-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
 }
-
-.adding-com textarea {
+.form-group input,
+.form-group textarea {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    resize: none;
-    font-size: 1em;
 }
-
-.adding-com button {
-    margin-top: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
+.form-group textarea {
+    resize: vertical;
+}
+.messtrial{
+   display: flex;
+    width: 100%;
+    height: 100%;
+  
+    margin-top: 10%;
+}
+.checkbox-item {
+    margin-bottom: 20px; /* Adjust the spacing between each checkbox item */
+}
+.checkbox-item input[type="checkbox"] {
+    margin-right: 5px; /* Adjust the spacing between the checkbox and label */
+}
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Center the modal */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
     cursor: pointer;
-    font-size: 1em;
 }
 
-.adding-com button:hover {
-    background-color: #0056b3;
-}
-
-/* Responsive Styles */
-@media (max-width: 600px) {
-    .post-comments-content {
-        padding: 15px;
-    }
-
-    .mainPostCardTitle {
-        font-size: 1.3em;
-    }
-
-    .mainPostCardText {
-        font-size: 0.9em;
-    }
-
-    .adding-com textarea {
-        font-size: 0.9em;
-    }
-
-    .adding-com button {
-        font-size: 0.9em;
-    }
 }

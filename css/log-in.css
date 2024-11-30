@@ -9,7 +9,7 @@
 #login-form,
 #signup-form  {
     position: absolute; /* Position it absolutely to the parent */
-    top: 50px; /* Adjust according to your design */
+    top: 200px; /* Adjust according to your design */
     left: 50%; /* Center horizontally */
     color: white;
     transform: translateX(-50%); /* Shift back by 50% of its width */
