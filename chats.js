@@ -85,8 +85,7 @@ async function fetchUserChats() {
 
             chatItem.innerHTML = `
             <button class="chat-button" data-chat-id="${chat.chat_id}">
-                <img src="${chat.image}" alt="${chat.name}" class="chat-image" 
-                onerror="this.onerror=null; this.src='./assets/logo.svg';"
+                <img src="${chat.image}" alt="chat group" class="chat-image" 
                 />
             </button>
             <div class="chat-details">
@@ -124,7 +123,7 @@ export function render() {
             <button id="showChatFormButton">Add</button>
 
             <div id="createChatFormContainer" style="display: none;">
-                <button id="closeChatFormButton" style="float: right; cursor: pointer;">X</button>
+                <button id="closeChatFormButton" style="float: right; cursor: pointer; font-weight: 10;">X</button>
                 <form id="createChatForm" action="/chats/create" method="POST">
                     <label for="chatName">Chat Name:</label>
                     <input type="text" name="name" id="chatName" required><br>
@@ -135,13 +134,9 @@ export function render() {
                     <label for="chatImage">Image URL:</label>
                     <input type="text" name="image" id="chatImage"><br>
                     
-                    <label for="chatType">Type:</label>
                     <select name="type" id="chatType" required>
-                        <option value="">Select Chat Type</option>
-                        <option value="group">Group</option>
-                        <option value="private">Private</option>
-                    </select><br>
-
+                    <option value="group" selected>Group</option>
+                    </select>
                     <button type="submit" id="createChatButton">Create Chat</button>
                 </form>
             </div>

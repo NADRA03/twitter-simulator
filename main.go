@@ -54,6 +54,7 @@ func main() {
 
 	handler := twitter.NewChatsHandler()
 	http.HandleFunc("/chats/create", handler.CreateChatHandler)
+	http.HandleFunc("/chats/direct/", handler.CreateDirectHandler)
 	http.HandleFunc("/chats/addUser", handler.AddUserToChatHandler)
 	http.HandleFunc("/chats/user", handler.GetUserChatsHandler)
 	http.HandleFunc("/allusers", twitter.GetAllUserDetailsHandler)
@@ -69,7 +70,6 @@ func main() {
 	http.HandleFunc("/top-followed-ids", twitter.TopFollowedUserIDsHandler)
 
 
-
 	http.Handle("/loader.js", http.FileServer(http.Dir(".")))
 	http.Handle("/search.js", http.FileServer(http.Dir(".")))
 	http.Handle("/sidebar.js", http.FileServer(http.Dir(".")))
@@ -80,6 +80,7 @@ func main() {
 	http.Handle("/chat.js", http.FileServer(http.Dir(".")))
 	http.Handle("/Profile.js", http.FileServer(http.Dir(".")))
     http.Handle("/a_profile.js", http.FileServer(http.Dir(".")))
+	http.Handle("/createPost.js", http.FileServer(http.Dir("."))) 
 
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./fonts"))))
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))

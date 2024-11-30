@@ -66,14 +66,24 @@
     margin-top: 20px;
 }
 
-#direct {
+#directButton {
+    all: unset; /* Removes all default styles */
+    background: none; /* Removes the background */
+    border: none; /* Removes the border */
+    padding: 0; /* Removes padding */
+    margin: 0; /* Removes margin */
+    cursor: pointer; /* Optional: ensures the button remains clickable */
+    display: inline-flex; /* Keep the layout */
     position: absolute;
     width: 30px; /* Increased size */
     height: 30px; /* Increased size */
     margin-left: 680px;
-    bottom: 445px;
+    bottom: 447px;
+}
 
-
+#direct{
+    width: 30px; /* Increased size */
+    height: 30px; /* Increased size */
 }
 
 
@@ -85,7 +95,7 @@
     border-radius: 30px; 
     padding: 10px 20px;
     height: auto;
-    border: 1px solid rgb(62, 65, 68);
+    border: 2px solid rgb(62, 65, 68);
     background-color: black;
     color: white;
     font-family: "Bold";

@@ -72,6 +72,16 @@ export async function loadPage(page) {
                     module.initialize();
                     app.innerHTML = module.render();
                     break;
+            case 'createPost' :
+                        module = await import('./createPost.js'); 
+                        app.innerHTML = module.render(); 
+                        module.initializeCreatePost(); 
+                        break;
+            case 'comment':
+                        module = await import('./comment.js'); 
+                        app.innerHTML = module.render(); 
+                        module.initialize(); 
+                        break;
             case 'chat':
                 // Render the main chat page (chats) and initialize chat-specific module
                 module = await import('./chats.js');
@@ -137,6 +147,10 @@ export async function getCurrentPage() {
         return 'log-in';
     } else if (path === '/profile') {
         return 'profile';
+    }else if (path === '/createPost'){
+        return 'createPost';
+    } else if (path === '/addComment'){
+        return 'addComment';
     } else {
         return 'home';
     }

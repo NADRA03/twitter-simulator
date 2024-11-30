@@ -44,7 +44,7 @@ body {
     left: 0;
     top: 0;
     bottom: 0; /* Extend to the bottom of the viewport */
-    border-right: 1px solid rgb(62, 65, 68); /* Grey line on the left */
+    border-right: 2px solid rgb(62, 65, 68); /* Grey line on the left */
     h1 {
         all: unset; /* Reset all inherited and default styles */
     }
@@ -83,7 +83,7 @@ body {
     right: 0;
     top: 0;
     bottom: 0; /* Extend to the bottom of the viewport */
-    border-left: 1px solid rgb(62, 65, 68); 
+    border-left: 2px solid rgb(62, 65, 68); 
 }
 
 
@@ -96,11 +96,11 @@ body.login-page .sidebar-right {
 }
 
 .sidebar-section {
-    border: 1px solid rgb(62, 65, 68);
+    border: 2px solid rgb(62, 65, 68);
     margin-bottom: 30px;
-    border-radius: 20px;
     padding: 0px 20px;
     width: 80%;
+    margin-left: 20px;
 
      ul {
         color: rgb(62, 65, 68);

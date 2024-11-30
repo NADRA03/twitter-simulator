@@ -1,0 +1,129 @@
+
+
+header {
+    text-align: right;
+    padding: 5px; /* Reduced padding */
+    background-color: #f2e3f2;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    height: 70px; /* Increased header height for better visibility */
+    width: 1280px;
+    border: #2B2924;
+    border-radius: 5px;
+}
+
+.site-title {
+    text-align: left;
+    font-size: 1.4rem; /* Increased font size for better visibility */
+    margin: 0;
+    color: #511282; /* Changed to a solid color for better contrast */
+}
+
+.links-section {
+    margin: 7px 0; /* Reduced margin */
+}
+
+button {
+    width: fit-content;
+    margin: -40px 5px; /* Reduced margin */
+    padding: 4px 4px; /* Smaller padding for buttons */
+    border: 1px solid rgb(76, 55, 79);
+    border-radius: 5px;
+    background: linear-gradient(144deg, #981cf0, #faf8c7, #e4a4ee);
+    color: rgb(32, 24, 24); /* Set text color to white for contrast */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 12px; /* Adjusted font size */
+    height: 25px;
+    margin-bottom: 400px;
+}
+
+button:hover {
+    background-color: #e9cdf6;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    padding: 20px; /* Adjusted to provide space */
+}
+
+.post-container {
+    max-width: 100px;
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Keep this to stack cards vertically */
+    gap: 20px;
+    margin-top: 10px;
+    align-items: flex-start; /* Align children to the start (left) */
+}
+
+.post-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: fit-content; /* Set to 100% to fill the container */
+    max-width: 1000px; /* Ensure it doesn't exceed the container width */
+}
+
+.post-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.username {
+    font-weight: bold;
+}
+
+.post-title {
+    font-size: 1.5rem;
+    margin: 10px 0;
+}
+
+.post-text {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.post-divider {
+    margin: 10px 0;
+    height: 1px;
+    background-color: #eee;
+}
+
+.interactions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.category-dropdown select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.comment-link a {
+    text-decoration: none;
+    color: #8a8a9c;
+}
+
+.comment-link a:hover {
+    text-decoration: underline;
+}
+
+.no-posts-message {
+    text-align: center;
+    color: #888;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #ffffff;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}

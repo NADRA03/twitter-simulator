@@ -45,7 +45,9 @@ export async function initialize(Id) {
                 <h2 id="username">${user.username}</h2>
                 <h2 id="name">${user.FirstName} ${user.LastName}</h2>
                 <img id="profileImage" src="${userImageUrl}" onError="this.onerror=null; this.src='${defaultImageUrl}'" />
-                <img id="direct" src="/assets/direct.svg"  />
+                        <button id="directButton" class="direct-btn">
+                                 <img id="direct" src="/assets/direct.svg" alt="Direct message" />
+                        </button>
                 <div id="followInfo">
             <span id="followingCount"><span class="white-text">${followingCount}</span> Following</span>
             <span id="followersCount"><span class="white-text" id="followersCountText">${followersCount}</span> Followers</span>
@@ -79,6 +81,24 @@ export async function initialize(Id) {
             } catch (error) {
                 console.error("Error following user:", error);
                 alert("Error following user");
+            }
+        });
+
+
+        document.getElementById('directButton').addEventListener('click', async () => {
+            try {
+                const chatResponse = await fetch(`/chats/direct?id=${Id}`);
+                if (!chatResponse.ok) {
+                    throw new Error("Failed to load chats.");
+                }
+
+                const chats = await chatResponse.json();
+                console.log("Loaded chats:", chats);
+                alert(`Chats loaded successfully!`);
+                // Optionally, render chats or navigate to chat view
+            } catch (error) {
+                console.error("Error loading chats:", error);
+                alert("Error loading chats.");
             }
         });
         

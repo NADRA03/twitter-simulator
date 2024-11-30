@@ -110,12 +110,82 @@ func (h *ChatsHandler) CreateChatHandler(w http.ResponseWriter, r *http.Request)
         return
     }
 
-    // Respond with the chat ID
-    w.WriteHeader(http.StatusCreated)
-    json.NewEncoder(w).Encode(map[string]int{"chat_id": chatID})
+    redirectURL := fmt.Sprintf("/chat/%d", chatID)
+    http.Redirect(w, r, redirectURL, http.StatusSeeOther) 
 }
 
+func (h *ChatsHandler) CreateDirectHandler(w http.ResponseWriter, r *http.Request) {
+    log.Println("Chat is being created")
 
+    // Validate the user session
+    session, err := ValidateSession(w, r, db)
+    if err != nil {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        log.Println("Unauthorized: Invalid session")
+        return
+    }
+
+    // Parse the URL parameter for the other user’s ID
+    otherUserIDStr := r.URL.Query().Get("id")
+    otherUserID, err := strconv.Atoi(otherUserIDStr)
+    if err != nil || otherUserID <= 0 {
+        http.Error(w, "Invalid user ID", http.StatusBadRequest)
+        log.Println("Invalid user ID provided:", otherUserIDStr)
+        return
+    }
+
+    // Parse the form data
+    if err := r.ParseForm(); err != nil {
+        http.Error(w, "Error parsing form", http.StatusBadRequest)
+        log.Println("Error parsing form:", err)
+        return
+    }
+
+    // Retrieve form values and set defaults if needed
+    name := r.FormValue("name")
+    if name == "" {
+        name = "Untitled Chat" // Default chat name
+    }
+
+    bio := r.FormValue("bio")
+    image := r.FormValue("image")
+    if image == "" {
+        image = "No Image" // Set default image if none provided
+    }
+
+    chatType := r.FormValue("type")
+    if chatType != "private" && chatType != "group" {
+        log.Println("Invalid chat type provided, defaulting to 'private'")
+        chatType = "private"
+    }
+
+    log.Println("Parsed form values:", name, bio, image, chatType)
+
+    // Insert the new chat
+    var chatID int
+    query := "INSERT INTO chats (chat_name, bio, type, image) VALUES (?, ?, ?, ?) RETURNING id"
+    args := []interface{}{name, bio, chatType, image}
+
+    err = db.QueryRow(query, args...).Scan(&chatID)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Error creating chat: %v", err), http.StatusInternalServerError)
+        log.Println("Error creating chat:", err)
+        return
+    }
+
+    // Add both the session user and the other user to the chat
+    _, err = db.Exec("INSERT INTO chat_users (chat_id, user_id, role) VALUES (?, ?, ?), (?, ?, ?)",
+        chatID, session.UserID, "admin",  // Add session user as admin
+        chatID, otherUserID, "participant") // Add other user as participant
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Error adding users to chat: %v", err), http.StatusInternalServerError)
+        log.Println("Error adding users to chat:", err)
+        return
+    }
+
+    redirectURL := fmt.Sprintf("/chat/%d", chatID)
+    http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
 
 // AddUserToChatHandler handles adding a user to a chat
 func (h *ChatsHandler) AddUserToChatHandler(w http.ResponseWriter, r *http.Request) {
