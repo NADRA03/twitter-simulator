@@ -5,6 +5,7 @@ let globalUsers = [];
 let globalMessages = [];
 let displayedMessageIds = new Set();
 let userLookup = {}; // Create a lookup for user details
+import { loadPage } from "./loader.js";
 
 // Function to populate the user lookup
 function populateUserLookup(users) {
@@ -364,8 +365,10 @@ function showInviteConfirmation(user) {
     // Yes button functionality
     confirmationBlock.querySelector("#yesInviteBtn").onclick = () => {
         inviteUserToChat(user.id); // Call inviteUserToChat without passing chatId
+        
         document.body.removeChild(confirmationBlock); // Remove after confirming
         enableAllButtons(); // Re-enable all other buttons
+        location.reload()
     };
 
     // No button functionality
