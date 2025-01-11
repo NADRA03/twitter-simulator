@@ -46,13 +46,17 @@ export async function loadPage(page) {
         switch (basePage) {
             case 'home':
                 module = await import('./home.js');
-                app.innerHTML = module.render();
+                module.initialize();
                 break;
             case 'search':
                     module = await import('./search.js');
                     app.innerHTML = module.render();
                     module.initialize();
                     break;
+            case '401':
+                module = await import('./401.js');
+                app.innerHTML = module.render();
+                break;
             case 'sign-up':
                 module = await import('./sign-up.js');
                 app.innerHTML = module.render();
@@ -61,6 +65,15 @@ export async function loadPage(page) {
                 module = await import('./log-in.js');
                 app.innerHTML = module.render();
                 module.initialize();
+                break;
+            case 'post':
+                const postId = parts[1];
+                module = await import('./post.js');
+                app.innerHTML = module.render(postId);
+                module.initialize(postId);
+                if (window.location.pathname !== `/post/${postId}`) {
+                    history.pushState({}, '', `/post/${postId}`);
+                }
                 break;
             case 'chats':
                 module = await import('./chats.js');
@@ -83,20 +96,18 @@ export async function loadPage(page) {
                         module.initialize(); 
                         break;
             case 'chat':
+                
                 // Render the main chat page (chats) and initialize chat-specific module
                 module = await import('./chats.js');
                 app.innerHTML = module.render();
                 module.initialize();
-
                 const chatId = parts[1];
-                const chatModule = await import('./chat.js');
-                document.getElementById('sidebar2').innerHTML = await chatModule.render(chatId);
-                chatModule.initialize(chatId);
-
-                // Update URL if not already set
                 if (window.location.pathname !== `/chat/${chatId}`) {
                     history.pushState({}, '', `/chat/${chatId}`);
                 }
+                const chatModule = await import('./chat.js');
+                document.getElementById('sidebar2').innerHTML = chatModule.render(chatId);
+                chatModule.initialize(chatId);
                 break;
             case 'a_profile':
                     const userId = parts[1];
@@ -143,8 +154,12 @@ export async function getCurrentPage() {
             return 'search';    
     } else if (path === '/chats') {
         return 'chats';
+    }else if (path.startsWith('/post/')) {
+        return `post/${path.split('/')[2]}`;
     } else if (path === '/log-in') {
         return 'log-in';
+    } else if (path === '/401') {
+            return '401';
     } else if (path === '/profile') {
         return 'profile';
     }else if (path === '/createPost'){
@@ -163,3 +178,4 @@ async function initialize() {
 }
 
 document.addEventListener("DOMContentLoaded", initialize);
+

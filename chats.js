@@ -1,5 +1,5 @@
 import { loadPage } from "./loader.js";
-
+const defaultImageUrl = '/assets/user2.png';
 
 
 async function fetchAllUsers() {
@@ -16,8 +16,8 @@ async function fetchAllUsers() {
         // You may still want to enable or disable the create chat button based on user availability
         document.getElementById("createChatButton").disabled = users.length === 0;
     } catch (error) {
-        console.error("Error fetching users:", error);
-        alert("Error fetching users: " + error.message);
+        document.body.dataset.status = '401'; 
+        loadPage(`401`);
     }
 }
 
@@ -50,6 +50,8 @@ async function fetchUserChats() {
             console.log("No chats found.");
             const chatList = document.getElementById("chatList");
             chatList.innerHTML = "<li>No chats found.</li>"; // Display message for no chats
+            document.body.dataset.status = '401'; 
+            loadPage(`401`);
             return; // Exit the function if chats is null
         }
 
@@ -85,12 +87,12 @@ async function fetchUserChats() {
 
             chatItem.innerHTML = `
             <button class="chat-button" data-chat-id="${chat.chat_id}">
-                <img src="${chat.image}" alt="chat group" class="chat-image" 
+                <img src="${chat.image}" alt="chat group" class="chat-image" onError="this.onerror=null; this.src='${defaultImageUrl}'"
                 />
             </button>
             <div class="chat-details">
                 <h3>${chat.name}</h3>
-                <p>${chat.last_message.message_text ? chat.last_message.message_text : 'No messages yet'}</p>
+                <p style="color:green;">${chat.last_message.message_text ? chat.last_message.message_text : 'No messages yet'}</p>
             </div>
             `;
 

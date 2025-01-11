@@ -1,126 +1,126 @@
-.form-and-sidebar-container {
 
-button {
-    background-color: #00072D; /* Blue background color for buttons */
-    color: #fff; /* White text color */
-    border: none; /* Remove default border */
-    padding: 10px 20px; /* Padding inside the buttons */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 0.9em; /* Slightly smaller font size for buttons */
-    cursor: pointer; /* Pointer cursor on hover */
-    display: inline-flex;
-    align-items: center; /* Center the icon and text vertically */
-    justify-content: center; /* Center the icon and text horizontally */
-    transition: background-color 0.3s, transform 0.2s; /* Smooth transition effects */
+.home {
+    font-family: "Regular";
 }
-button:hover {
-   
-    transform: scale(1.05); /* Slightly scale up the button on hover */
-}
-button i {
-    margin-right: 5px; /* Space between icon and text */
-}
-.navigation-buttonsm {
-    margin-top: 20px; /* Space above the navigation buttons */
-}
-.creatingcontainer {
-   
-    width: 100%;
-    height: 100%;
-}
-/* Specific form class */
-.create-post-form {
+
+
+.input-container {
+    font-family: "Regular";
     display: flex;
-    width: 100%;
-    height: 100%;
-}
+    flex-direction: column; /* Stack input, line, and button vertically */
+    gap: 10px; /* Space between input and button */
+    padding: 10px;
     width: 100%; /* Ensure it takes full width */
-    height: 100vh; /* Make it take full viewport height */
-   
-    padding: 0; /* Remove default padding */
-    margin-top: 10%;
-
-/* Sidebar */
-.sidebar {
-    
-    width: 25%; /* Adjust as needed */
-    padding: 10px;
-    border-right: 1px solid #ddd;
-    margin-left: 5px; 
-    flex-shrink: 0; /* Prevent the sidebar from shrinking */
-    display: flex; /* Ensures items are aligned vertically */
-    flex-direction: column; /* Stacks items vertically */
 }
-/* Main content area */
-.main-creating {
-    width: 70%; /* Adjust as needed */
-    padding: 20px;
-   
+
+/* User Image Styling */
+.user-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 10px; /* Space between image and input */
+    object-fit: cover;
+    align-self: flex-start; /* Align image to the left */
+}
+
+/* Input Field Container Styling (Horizontal layout for image and input) */
+.input-field-container {
     display: flex;
-    flex-direction: column; /* Ensure content inside is stacked vertically */
-    flex-shrink: 0; /* Prevent the sidebar from shrinking */
-}
-/* Form Elements */
-.form-group {
-    margin-bottom: 20px;
-}
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-.form-group textarea {
-    resize: vertical;
-}
-.messtrial{
-   display: flex;
-    width: 100%;
-    height: 100%;
-  
-    margin-top: 10%;
-}
-.checkbox-item {
-    margin-bottom: 20px; /* Adjust the spacing between each checkbox item */
-}
-.checkbox-item input[type="checkbox"] {
-    margin-right: 5px; /* Adjust the spacing between the checkbox and label */
-}
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
-}
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* Center the modal */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
-}
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-.close-button:hover,
-.close-button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+    align-items: center; /* Vertically center the image and input */
+    width: 100%; /* Ensure it takes full width */
+    margin-bottom: 10px;
 }
 
+/* Input Field Styling */
+.input-container input[type="text"] {
+    font-family: "Regular";
+    padding: 10px;
+    font-size: 25px;
+    border: none;
+    color: white;
+    background-color: black;
+    width: 100%; /* Make input take full width */
 }
+
+.input-container input[type="text"]:focus {
+    outline: none; /* Remove default outline */
+    border: none; /* Remove border */
+}
+/* Line between input and button */
+.input-container .line {
+    height: 1px;
+    background-color: rgb(62, 65, 68); 
+    width: 100%;
+}
+
+/* Post Button Styling */
+.post-button {
+    font-family: "Regular";
+    background-color: white;
+    color: black;
+    font-weight: bold;
+    padding: 10px;
+    margin-left: 80%;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 70px;
+    transition: background-color 0.3s ease;
+}
+
+/* Post Button Hover Styling */
+.post-button:hover {
+    background-color: #f0f0f0;
+}
+
+/* Post Button Disabled Styling */
+.post-button:disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+/* Styling for Posts Section */
+.post {
+    padding: 15px;
+    margin-bottom: 0px;
+    border-bottom: 2px solid rgb(62, 65, 68); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 150px;
+}
+.post-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px; /* Space between image and input */
+    object-fit: cover;
+    align-self: flex-start; /* Align image to the left */
+    position: relative;
+    top: 40px;
+}
+.post p {
+    margin: 5px 0;
+}
+
+/* Styling for "No Posts Available" Message */
+.no-posts-message {
+    text-align: center;
+    font-size: 18px;
+    color: #999;
+}
+
+.content {
+    position: relative;
+    top: 40px;
+    color: white;
+    left: 65px;
+}
+
+

@@ -11,7 +11,7 @@ function populateUserLookup(users) {
     userLookup = users.reduce((lookup, user) => {
         lookup[user.id] = {
             username: user.username,
-            imageUrl: user.image_url ? user.image_url.String : '/assets/user.svg',
+            imageUrl: user.image_url ? user.image_url.String : '/assets/user2.png',
             onlineStatus: 'Offline'
         };
         return lookup;
@@ -35,7 +35,7 @@ function fetchOnlineStatus() {
 function updateUserList() {
     const userListHTML = globalUsers.map(user => `
         <div class="user-item">
-            <img src="${user.image_url.String || '/assets/user.svg'}" alt="${user.username}'s profile picture" class="user-image" />
+            <img src="${user.image_url.String || '/assets/user2.png'}" alt="${user.username}'s profile picture" class="user-image" />
             <span class="user-name">${user.username}</span>
             <span class="user-status ${userLookup[user.id].onlineStatus === 'Online' ? 'online' : 'offline'}">
                 ${userLookup[user.id].onlineStatus}
@@ -59,30 +59,46 @@ function startUserStatusUpdate() {
 
 
 export function render(chatId) {
+    console.log("Rendering chat with ID:", chatId);
+    console.log("Global messages:", globalMessages);
+    console.log("User list:", globalUsers);
+    // Ensure globalMessages is defined, even if it's empty
+    if (!globalMessages) {
+        globalMessages = [];
+    }
+
     const uniqueMessageIds = new Set();
-    
+
     const uniqueMessages = globalMessages.filter(message => {
-        if (uniqueMessageIds.has(message.message_id)) {
+        if (uniqueMessageIds.has(message.message_id.Int64)) {
             return false;
         }
-        uniqueMessageIds.add(message.message_id);
+        uniqueMessageIds.add(message.message_id.Int64);
         return true;
     });
 
     // Create a promise array for checking user details for all messages
     const messagePromises = uniqueMessages.map(async (message) => {
-        const user = userLookup[message.user_id] || { username: 'Unknown', imageUrl: '/assets/user.svg' };
+        // Safely access user_id (check if valid)
+        const userId = message.user_id.Valid ? message.user_id.Int64 : null;
         
+        // Get user details using userId (if valid)
+        const user = userId && userLookup[userId] || { username: 'Unknown', imageUrl: '/assets/user2.png' };
+
         // Call fetchUserDetails to check if the message should go to the right
-        const isCurrentUserMessage = await fetchUserDetails(message.user_id);
-        
+        const isCurrentUserMessage = await fetchUserDetails(userId);
+
+        // Safely access message text and image URL (if valid)
+        const messageText = message.message_text.Valid ? message.message_text.String : 'Invalid message text';
+        const imageUrl = message.image_url.Valid ? message.image_url.String : null;
+
         // Create the message element
         const messageElement = `
             <div class="message-item ${isCurrentUserMessage ? 'right' : ''}">
-                <img src="${user.imageUrl || '/assets/user.svg'}"  class="user-image" />
+                <img src="${user.imageUrl || '/assets/user2.png'}" class="user-image" />
                 <span class="message-username">${user.username}:</span>
-                <span class="message-text">${message.message_text.String}</span>
-                ${message.image_url ? `<img src="${message.image_url.String}" class="message-image" />` : ''}
+                <span class="message-text">${messageText}</span>
+                ${imageUrl ? `<img src="${imageUrl}" class="message-image" />` : ''}
             </div>
         `;
         
@@ -101,9 +117,9 @@ export function render(chatId) {
 
     return `
         <div class="chatContainer">
-            <button id="infoButton" class="info-button"><img src="/assets/info.svg"  class="user-image" /></button>
+            <button id="infoButton" class="info-button"><img src="/assets/info.svg" class="user-image" /></button>
             <div id="chatMessages">
-                ${uniqueMessages.length > 0 ? '' : '<p>No messages yet.</p>'}
+                ${uniqueMessages.length === 0 ? '<p>No messages yet.</p>' : ''}
             </div>
             <div id="send">
                 <input type="text" id="messageInput" placeholder="Type your message..." />
@@ -117,7 +133,7 @@ export function render(chatId) {
                 <div id="addPeopleSection" style="display: none;">
                     <p>Add people to the chat:</p>
                     <input type="text" id="addPeopleInput" />
-                    <button  style="display: none;" id="confirmAddPeopleBtn">Add</button>
+                    <button style="display: none;" id="confirmAddPeopleBtn">Add</button>
                 </div>
                 <div id="userSearchResults"></div>
 
@@ -125,7 +141,7 @@ export function render(chatId) {
                     <h3>Participants</h3>
                     ${globalUsers.map(user => `
                         <div class="user-item">
-                            <img src="${user.image_url.String || '/assets/user.svg'}" alt="${user.username}'s profile picture" class="user-image" />
+                            <img src="${user.image_url.String || '/assets/user2.png'}" alt="${user.username}'s profile picture" class="user-image" />
                             <span class="user-name">${user.username}</span>
                             <span class="user-status ${userLookup[user.id].onlineStatus === 'Online' ? 'online' : 'offline'}">
                                 ${userLookup[user.id].onlineStatus}
@@ -137,6 +153,7 @@ export function render(chatId) {
         </div>
     `;
 }
+
 
 function enableAllButtons() {
     const allButtons = document.querySelectorAll("button");
@@ -171,12 +188,12 @@ async function displayMessage(messageData) {
     displayedMessageIds.add(messageData.message_id);
 
     const chatMessages = document.getElementById("chatMessages");
-    const user = userLookup[messageData.user_id] || { username: 'Unknown', imageUrl: '/assets/user.svg' };
+    const user = userLookup[messageData.user_id] || { username: 'Unknown', imageUrl: '/assets/user2.png' };
 
     const messageElement = document.createElement("div");
     messageElement.className = "message-item";
     messageElement.innerHTML = `
-        <img src="${user.imageUrl || '/assets/user.svg'}"  class="user-image" />
+        <img src="${user.imageUrl || '/assets/user2.png'}"  class="user-image" />
         <span class="message-username">${user.username}:</span>
         <span class="message-text">${messageData.message_text}</span>
         ${messageData.image_url ? `<img src="${messageData.image_url}" alt="Attached image" class="message-image" />` : ''}
@@ -306,8 +323,10 @@ function displaySearchResults(users) {
         userElement.className = "user";
         userElement.innerHTML = `
             <br>
-            <img src="${user.image_url || '/assets/user.svg'}" style="width: 40px; height: 40px; border-radius: 20px; cursor: pointer;"   onerror="this.onerror=null; this.src='./assets/user.svg';"/> 
-            <span style="cursor: pointer;">${user.username}</span>
+            <div class="searched">
+            <img src="${user.image_url || '/assets/user2.png'}" style="width: 40px; height: 40px; border-radius: 20px; cursor: pointer;"   onerror="this.onerror=null; this.src='/assets/user2.png';"/> 
+            <p class="search-text" style="cursor: pointer;">${user.username}</p>
+            <div>
         `;
 
         // Click event for inviting the user
@@ -399,19 +418,19 @@ async function fetchChatDetails(chatId) {
         });
 }
 
-export function initialize(chatIdParam) {
+ export async function initialize(chatIdParam) {
     chatId = chatIdParam;
     console.log("Chat ID:", chatId); // Add this line
+    
+    initializeWebSocket(chatId);
+    await fetchChatDetails(chatId);
+    
     const chatContent = render(chatId);
     document.getElementById("sidebar2").innerHTML = chatContent;
-  
-    initializeWebSocket(chatId);
     
-    fetchChatDetails(chatId).then(() => {
-        console.log("Chat Details:", globalChatDetails);
-        console.log("Users:", globalUsers);
-        console.log("Messages:", globalMessages);
-    });
+    console.log("Chat Details:", globalChatDetails);
+    console.log("Users:", globalUsers);
+    console.log("Messages:", globalMessages);
 
     startUserStatusUpdate();
     
@@ -470,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pathSegments = window.location.pathname.split('/');
     const chatIdParam = pathSegments[pathSegments.length - 1]; // Get the last segment as `chatId`
     if (chatIdParam) {
-        initialize(chatIdParam);  // Initialize with the extracted `chatId`
+       initialize(chatIdParam); 
     } else {
         console.error("chatId not found in the URL.");
     }

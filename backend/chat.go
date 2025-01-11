@@ -29,11 +29,11 @@ type ChatDetails struct {
 }
 
 type Message struct {
-    MessageID   int             `json:"message_id"`
-    UserID      int             `json:"user_id"`      // Add UserID field
-    MessageText sql.NullString   `json:"message_text"`
-    ImageURL    sql.NullString   `json:"image_url"`
-    CreatedAt   sql.NullTime     `json:"created_at"`
+    MessageID   sql.NullInt64   `json:"message_id"`   // Nullable message_id
+    UserID      sql.NullInt64   `json:"user_id"`      // Nullable user_id
+    MessageText sql.NullString  `json:"message_text"`
+    ImageURL    sql.NullString  `json:"image_url"`
+    CreatedAt   sql.NullTime    `json:"created_at"`
 }
 
 
@@ -115,7 +115,7 @@ func (h *ChatsHandler) CreateChatHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *ChatsHandler) CreateDirectHandler(w http.ResponseWriter, r *http.Request) {
-    log.Println("Chat is being created")
+    log.Println("Processing chat creation or redirection")
 
     // Validate the user session
     session, err := ValidateSession(w, r, db)
@@ -125,7 +125,7 @@ func (h *ChatsHandler) CreateDirectHandler(w http.ResponseWriter, r *http.Reques
         return
     }
 
-    // Parse the URL parameter for the other user’s ID
+    // Parse the URL parameter for the other user's ID
     otherUserIDStr := r.URL.Query().Get("id")
     otherUserID, err := strconv.Atoi(otherUserIDStr)
     if err != nil || otherUserID <= 0 {
@@ -134,58 +134,57 @@ func (h *ChatsHandler) CreateDirectHandler(w http.ResponseWriter, r *http.Reques
         return
     }
 
-    // Parse the form data
-    if err := r.ParseForm(); err != nil {
-        http.Error(w, "Error parsing form", http.StatusBadRequest)
-        log.Println("Error parsing form:", err)
+    // Check if a private chat already exists between the two users
+    var existingChatID int
+    query := `
+        SELECT c.id 
+        FROM chats c
+        JOIN chat_users cu1 ON c.id = cu1.chat_id
+        JOIN chat_users cu2 ON c.id = cu2.chat_id
+        WHERE c.type = 'private' AND cu1.user_id = ? AND cu2.user_id = ?`
+    err = db.QueryRow(query, session.UserID, otherUserID).Scan(&existingChatID)
+    if err == nil {
+        // Private chat already exists, redirect to it
+        log.Println("Private chat already exists. Redirecting to chat ID:", existingChatID)
+        response := map[string]string{
+            "redirectUrl": fmt.Sprintf("/chat/%d", existingChatID),
+        }
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(response)
         return
     }
 
-    // Retrieve form values and set defaults if needed
-    name := r.FormValue("name")
-    if name == "" {
-        name = "Untitled Chat" // Default chat name
-    }
-
-    bio := r.FormValue("bio")
-    image := r.FormValue("image")
-    if image == "" {
-        image = "No Image" // Set default image if none provided
-    }
-
-    chatType := r.FormValue("type")
-    if chatType != "private" && chatType != "group" {
-        log.Println("Invalid chat type provided, defaulting to 'private'")
-        chatType = "private"
-    }
-
-    log.Println("Parsed form values:", name, bio, image, chatType)
-
-    // Insert the new chat
-    var chatID int
-    query := "INSERT INTO chats (chat_name, bio, type, image) VALUES (?, ?, ?, ?) RETURNING id"
-    args := []interface{}{name, bio, chatType, image}
-
-    err = db.QueryRow(query, args...).Scan(&chatID)
+    // If no existing chat, create a new one
+    log.Println("No existing private chat found. Creating a new chat.")
+    var newChatID int
+    insertChatQuery := "INSERT INTO chats (chat_name, bio, type, image) VALUES (?, ?, ?, ?) RETURNING id"
+    err = db.QueryRow(insertChatQuery, "Untitled Chat", "", "private", "").Scan(&newChatID)
     if err != nil {
         http.Error(w, fmt.Sprintf("Error creating chat: %v", err), http.StatusInternalServerError)
         log.Println("Error creating chat:", err)
         return
     }
 
-    // Add both the session user and the other user to the chat
-    _, err = db.Exec("INSERT INTO chat_users (chat_id, user_id, role) VALUES (?, ?, ?), (?, ?, ?)",
-        chatID, session.UserID, "admin",  // Add session user as admin
-        chatID, otherUserID, "participant") // Add other user as participant
+    // Add both users to the chat
+    _, err = db.Exec(`
+        INSERT INTO chat_users (chat_id, user_id, role) VALUES (?, ?, ?), (?, ?, ?)`,
+        newChatID, session.UserID, "admin", // Add session user as admin
+        newChatID, otherUserID, "participant") // Add the other user as participant
     if err != nil {
         http.Error(w, fmt.Sprintf("Error adding users to chat: %v", err), http.StatusInternalServerError)
         log.Println("Error adding users to chat:", err)
         return
     }
 
-    redirectURL := fmt.Sprintf("/chat/%d", chatID)
-    http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+    // Respond with the new chat's redirect URL
+    log.Println("New private chat created. Redirecting to chat ID:", newChatID)
+    response := map[string]string{
+        "redirectUrl": fmt.Sprintf("/chat/%d", newChatID),
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
 }
+
 
 // AddUserToChatHandler handles adding a user to a chat
 func (h *ChatsHandler) AddUserToChatHandler(w http.ResponseWriter, r *http.Request) {
@@ -254,19 +253,36 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
     log.Println("Request received to send chats")
 
     // Validate user session
-    session, err := ValidateSession(w, r, db) // Using db directly
+    session, err := ValidateSession(w, r, db)
     if err != nil {
         http.Error(w, "Session invalid or expired", http.StatusUnauthorized)
         log.Printf("Session validation error: %v", err)
         return
     }
 
-    // Prepare the query to fetch chat details and the last message for the given user ID
+    // Prepare the query to fetch chat details, the last message, and other user details for private chats
     query := `
         SELECT 
             c.id AS chat_id, 
-            c.chat_name, 
-            c.image,
+            CASE 
+                WHEN c.type = 'private' THEN (
+                    SELECT u.username 
+                    FROM users u
+                    JOIN chat_users cu ON u.id = cu.user_id
+                    WHERE cu.chat_id = c.id AND u.id != ?
+                )
+                ELSE c.chat_name
+            END AS chat_name,
+            CASE 
+                WHEN c.type = 'private' THEN (
+                    SELECT u.image_url 
+                    FROM users u
+                    JOIN chat_users cu ON u.id = cu.user_id
+                    WHERE cu.chat_id = c.id AND u.id != ?
+                )
+                ELSE c.image
+            END AS chat_image_url,
+            c.type AS chat_type,
             COALESCE(m.message_text, '') AS last_message_text,
             COALESCE(m.created_at, '') AS last_message_created_at
         FROM chats c
@@ -284,7 +300,7 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
     `
 
     // Execute the query
-    rows, err := db.Query(query, session.UserID)
+    rows, err := db.Query(query, session.UserID, session.UserID, session.UserID)
     if err != nil {
         log.Printf("Error executing query: %v", err)
         http.Error(w, "Error fetching user chats", http.StatusInternalServerError)
@@ -296,10 +312,18 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
     var chats []Chat
     for rows.Next() {
         var chat Chat
-        if err := rows.Scan(&chat.ChatID, &chat.Name, &chat.ImageURL, &chat.LastMessage.MessageText, &chat.LastMessage.CreatedAt); err != nil {
+        var chatImageURL sql.NullString // Handle potential NULL values
+        if err := rows.Scan(&chat.ChatID, &chat.Name, &chatImageURL, &chat.Type, &chat.LastMessage.MessageText, &chat.LastMessage.CreatedAt); err != nil {
             log.Printf("Error scanning chat data: %v", err)
             http.Error(w, "Error scanning chat data", http.StatusInternalServerError)
             return
+        }
+
+        // Convert NULL to an empty string for chat image URL
+        if chatImageURL.Valid {
+            chat.ImageURL = chatImageURL.String
+        } else {
+            chat.ImageURL = ""
         }
 
         // Append the chat to the list
@@ -319,7 +343,6 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
         log.Printf("Error encoding response as JSON: %v", err)
         http.Error(w, "Error encoding response as JSON", http.StatusInternalServerError)
     }
-
 }
 
 
@@ -355,7 +378,6 @@ func CreateInvitationHandler(h *ChatsHandler) http.HandlerFunc {
     }
 }
 
-// GetChatDetailsHandler handles fetching chat details including messages and users
 func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Request) {
     log.Println("Request received to fetch chat details")
 
@@ -375,7 +397,7 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
         return
     }
 
-    // Prepare the query to fetch chat details, messages, and users
+    // Prepare the query to fetch chat details, users, and messages
     query := `
         SELECT 
             c.id AS chat_id,
@@ -385,7 +407,7 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
             u.username AS name,
             u.image_url AS user_image_url,
             m.message_id AS message_id,
-            m.user_id AS message_user_id,  -- Added user_id for messages
+            m.user_id AS message_user_id,
             m.message_text,
             m.created_at
         FROM chats c
@@ -412,12 +434,14 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
     userMap := make(map[int]User)
     var messages []Message
 
+    // Check if there are any rows
+    hasMessages := false
     for rows.Next() {
         var userID int
         var userName string
         var profileImage sql.NullString
-        var messageID int
-        var messageUserID int           // Variable for message user ID
+        var messageID sql.NullInt64  // Change to sql.NullInt64
+        var messageUserID sql.NullInt64  // Change to sql.NullInt64
         var messageText sql.NullString
         var createdAt sql.NullTime
 
@@ -433,15 +457,21 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
             userMap[userID] = User{Id: userID, Username: userName, ImageURL: profileImage}
         }
 
-        // Add message to messages slice if messageText is not empty
-        if messageText.Valid {
+        // Add message to messages slice if messageText is not empty and messageID is valid
+        if messageText.Valid && messageID.Valid {
             messages = append(messages, Message{
-                MessageID:   messageID,
-                UserID:      messageUserID,  // Include user ID for each message
+                MessageID:   messageID,   // Include message ID as sql.NullInt64
+                UserID:      messageUserID,  // Include message user ID as sql.NullInt64
                 MessageText: messageText, 
                 CreatedAt:   createdAt,
             })
+            hasMessages = true
         }
+    }
+
+    // If no messages were found, set hasMessages to false, but still return users
+    if !hasMessages {
+        log.Println("No messages found for chat")
     }
 
     // Convert user map to slice
@@ -460,9 +490,20 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
         Users:       users,
         Messages:    messages,
     }
-    log.Printf("sent details")
-    
+
+    // Log sent details (optionally)
+    log.Printf("Chat details: %+v", chatDetails)
+    log.Printf("Users: %+v", users)
+    log.Printf("Messages: %+v", messages)
+
     // Set response header and encode response
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(response)
+    err = json.NewEncoder(w).Encode(response)
+    if err != nil {
+        log.Printf("Error encoding response: %v", err)
+        http.Error(w, "Error sending response", http.StatusInternalServerError)
+    } else {
+        log.Println("Sent chat details successfully")
+    }
 }
+

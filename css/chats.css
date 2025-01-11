@@ -50,7 +50,7 @@ button:hover {
 }
 
 #chatList li {
-    background-color: black;
+    background-color: none;
     border-radius: 0px;
     padding: 10px;
     transition: background-color 0.2s ease;
@@ -58,7 +58,6 @@ button:hover {
 
 /* Chat list hover effect */
 #chatList li:hover {
-    background-color: #dcdcdcd1;
 }
 
 /* Responsive adjustments */

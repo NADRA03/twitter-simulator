@@ -60,7 +60,7 @@
 .info-button {
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 0px;
     background-color: transparent;
     color: white;
     border: none;
@@ -266,4 +266,12 @@ button {
 
 .confirmation-block button:hover {
     opacity: 0.9; /* Slight fade effect on hover */
+}
+
+.search-text {
+    margin-left: 10px;
+}
+
+.searched {
+    display: flex; 
 }

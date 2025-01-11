@@ -68,7 +68,12 @@ func main() {
 	http.HandleFunc("/followersCount", twitter.FollowersCountHandler)
 	http.HandleFunc("/followingCount", twitter.FollowingCountHandler)
 	http.HandleFunc("/top-followed-ids", twitter.TopFollowedUserIDsHandler)
-
+	http.HandleFunc("/createPost", twitter.CreatePost)
+    http.HandleFunc("/posts", twitter.GetAllPosts)
+	http.HandleFunc("/posts/", twitter.GetMyPosts)
+	http.HandleFunc("/createComment", twitter.CreateComm)
+	http.HandleFunc("/postComments/", twitter.GetCommentsByPost)
+	http.HandleFunc("/a_post/", twitter.GetPostById)
 
 	http.Handle("/loader.js", http.FileServer(http.Dir(".")))
 	http.Handle("/search.js", http.FileServer(http.Dir(".")))
@@ -81,6 +86,8 @@ func main() {
 	http.Handle("/Profile.js", http.FileServer(http.Dir(".")))
     http.Handle("/a_profile.js", http.FileServer(http.Dir(".")))
 	http.Handle("/createPost.js", http.FileServer(http.Dir("."))) 
+	http.Handle("/post.js", http.FileServer(http.Dir("."))) 
+	http.Handle("/401.js", http.FileServer(http.Dir("."))) 
 
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./fonts"))))
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))

@@ -14,6 +14,7 @@ type LastMessage struct {
 // Define the struct for Chat
 type Chat struct {
     ChatID      int       `json:"chat_id"`
+    Type        string     `json:"type"`
     Name        string    `json:"name"`
     ImageURL    string    `json:"image"`
     LastMessage LastMessage `json:"last_message"`

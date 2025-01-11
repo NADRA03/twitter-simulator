@@ -55,7 +55,7 @@ function displaySearchResults(users) {
         userElement.className = "user";
         userElement.innerHTML = `
             <br>
-            <img src="${user.image_url}" style=" border-radius: 20px; cursor: pointer;" data-user-id="${user.id}" onError="this.onerror=null; this.src='/assets/user.svg'" /> 
+            <img src="${user.image_url}" style=" border-radius: 20px; cursor: pointer;" data-user-id="${user.id}" onError="this.onerror=null; this.src='/assets/user2.png'" /> 
             <span style="cursor: pointer;" data-user-id="${user.id}">${user.username}</span>
         `;
 

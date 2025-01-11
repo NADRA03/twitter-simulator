@@ -89,7 +89,7 @@
 
 #followButton {
     margin-left: 740px;
-    position: fixed;
+    position: absolute;
     bottom: 440px;
     width: auto;
     border-radius: 30px; 
@@ -100,6 +100,50 @@
     color: white;
     font-family: "Bold";
     font-size: 18px;
+}
+
+#postsContainer {
+    margin-left: 150px;
+    margin-top: 15px;
+
+}
+
+.post {
+    padding: 10px;
+    margin-bottom: 0px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid rgb(62, 65, 68); 
+    height: 150px;
+
+}
+.post-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px; /* Space between image and input */
+    object-fit: cover;
+    align-self: flex-start; /* Align image to the left */
+    position: relative;
+    top: 40px;
+}
+.post p {
+    color: white;
+    padding: 0;
+}
+
+/* Styling for "No Posts Available" Message */
+.no-posts-message {
+    font-size: 18px;
+    color: rgb(113, 118, 123);
+    padding: 10px;
+    margin-top: 100px;
+}
+
+.content {
+    position: relative;
+    top: 40px;
+    color: white;
+    left: 65px;
 }
 
 }

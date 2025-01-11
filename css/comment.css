@@ -1,136 +1,180 @@
-
-/* Post Comments Content */
-.post-comments-content {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+#post-container {
+    max-width: 800px;
+    margin: 20px auto;
     padding: 20px;
-    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
-
-/* Individual Comment Post */
-.com-post {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fafafa;
+h3 {
+    margin-top: 30px;
+    font-size: 30px;
 }
 
-/* Meta Information */
-.mainPostCardMeta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+/* Post Styles */
+.post {
+    margin-bottom: 0px;
+    border-bottom: 2px solid rgb(62, 65, 68); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 150px;
+    width: 600px;
+    padding-bottom: 30px;
 }
 
-.mainPostCardUsername {
-    font-weight: bold;
-    color: #007bff;
+.post .avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 10px; /* Space between image and input */
+    object-fit: cover;
+    align-self: flex-start; /* Align image to the left */
+    position: relative;
+    top: 70px;
 }
 
-.post-date {
-    font-size: 0.9em;
-    color: #666;
+.post-content {
+    flex: 1;
 }
 
-/* Post Title */
-.mainPostCardTitle {
-    font-size: 1.5em;
-    margin: 10px 0;
-}
-
-/* Post Content */
-.mainPostCardText {
-    font-size: 1em;
-    line-height: 1.5;
-}
-
-/* Interaction Section */
-.interact {
-    margin-top: 10px;
-    cursor: pointer;
-    color: #007bff;
-}
-
-.interact h4 {
-    display: inline;
-}
-
-/* Comments Section */
-.bluetrial {
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px solid #e0e0e0;
-}
-
-.com-post-main {
-    margin-bottom: 10px;
-    padding: 10px;
-    border-left: 3px solid #007bff;
-    background-color: #f9f9f9;
-}
-
-.comment-content-log {
-    margin: 5px 0;
-}
-
-/* Add Comment Form */
-.adding-com {
-    margin-top: 20px;
-}
-
-.adding-com label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.adding-com textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: none;
-    font-size: 1em;
-}
-
-.adding-com button {
-    margin-top: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
+.post-content h4 {
+    position: relative;
     color: white;
+    left: 90px;
+    bottom: 20px;
+}
+
+.post-content p {
+    position: relative;
+    color: white;
+    left: 90px;
+}
+
+
+
+
+
+
+/* Comment Styles */
+.comment {
+    margin-top: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 10px 0;
+    border-bottom: 2px solid rgb(62, 65, 68);
+}
+
+.comment:last-child {
+    border-bottom: none;
+}
+
+.comment .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-content h5 {
+    margin: 0 0 5px;
+    font-size: 14px;
+}
+
+.comment-content p {
+    margin-top: 25px;
+}
+
+
+
+
+
+
+
+
+#reply-form-container {
+    display: flex;
+    align-items: center; /* Vertically center the image and input */
+    width: 100%; /* Ensure it takes full width */
+    margin-bottom: 30px;
+    margin-top: 30px;
+    border-bottom: 2px solid rgb(62, 65, 68); 
+    padding-bottom: 30px;
+}
+
+input[type="text"] {
+    background-color: black;
+    font-family: "Regular";
+    padding: 10px;
+    font-size: 25px;
+    border: none;
+    color: white;
+}
+
+
+input[type="text"]:focus {
+    outline: none; /* Remove default outline */
+    border: none; /* Remove border */
+}
+
+/* Post Button Styling */
+.post-button {
+    margin-top: 60px;
+    font-family: "Regular";
+    background-color: white;
+    color: black;
+    font-weight: bold;
+    padding: 10px;
+    margin-left: 150px;
+    border: none;
+    border-radius: 20px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 16px;
+    width: 90px;
+    transition: background-color 0.3s ease;
 }
 
-.adding-com button:hover {
-    background-color: #0056b3;
+/* Post Button Hover Styling */
+.post-button:hover {
+    background-color: #f0f0f0;
 }
 
-/* Responsive Styles */
+/* Post Button Disabled Styling */
+.post-button:disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+}
+
+
+
+
+
+/* Responsive Design */
 @media (max-width: 600px) {
-    .post-comments-content {
-        padding: 15px;
+    #post-container {
+        padding: 10px;
     }
 
-    .mainPostCardTitle {
-        font-size: 1.3em;
+    .post,
+    .comment {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .mainPostCardText {
-        font-size: 0.9em;
+    .post-content h4,
+    .comment-content h5 {
+        font-size: 14px;
     }
 
-    .adding-com textarea {
-        font-size: 0.9em;
+    .post-content p,
+    .comment-content p {
+        font-size: 12px;
     }
 
-    .adding-com button {
-        font-size: 0.9em;
+    .reply-button {
+        font-size: 11px;
     }
 }
 
