@@ -50,8 +50,6 @@ async function fetchUserChats() {
             console.log("No chats found.");
             const chatList = document.getElementById("chatList");
             chatList.innerHTML = "<li>No chats found.</li>"; // Display message for no chats
-            document.body.dataset.status = '401'; 
-            loadPage(`401`);
             return; // Exit the function if chats is null
         }
 
