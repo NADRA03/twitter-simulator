@@ -397,7 +397,7 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
         return
     }
 
-    // Prepare the query to fetch chat details, users, and messages
+    // Prepare the query to fetch chat details and the last 10 messages
     query := `
         SELECT 
             c.id AS chat_id,
@@ -405,19 +405,13 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
             c.image AS image_url,
             u.id AS user_id,
             u.username AS name,
-            u.image_url AS user_image_url,
-            m.message_id AS message_id,
-            m.user_id AS message_user_id,
-            m.message_text,
-            m.created_at
+            u.image_url AS user_image_url
         FROM chats c
         LEFT JOIN chat_users cu ON c.id = cu.chat_id
         LEFT JOIN users u ON cu.user_id = u.id
-        LEFT JOIN messages m ON c.id = m.chat_id
-        WHERE c.id = ?
-    `
+        WHERE c.id = ?`
 
-    // Execute the query
+    // Execute the query for chat details
     rows, err := db.Query(query, chatID)
     if err != nil {
         log.Printf("Error executing query: %v", err)
@@ -430,22 +424,16 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
     var chatDetails ChatDetails
     chatDetails.ChatID = chatID
 
-    // Temporary maps to hold user details and messages
+    // Temporary map to hold user details
     userMap := make(map[int]User)
-    var messages []Message
 
-    // Check if there are any rows
-    hasMessages := false
+    // Scan rows for chat details and users
     for rows.Next() {
         var userID int
         var userName string
         var profileImage sql.NullString
-        var messageID sql.NullInt64  // Change to sql.NullInt64
-        var messageUserID sql.NullInt64  // Change to sql.NullInt64
-        var messageText sql.NullString
-        var createdAt sql.NullTime
 
-        err := rows.Scan(&chatDetails.ChatID, &chatDetails.ChatName, &chatDetails.ImageURL, &userID, &userName, &profileImage, &messageID, &messageUserID, &messageText, &createdAt)
+        err := rows.Scan(&chatDetails.ChatID, &chatDetails.ChatName, &chatDetails.ImageURL, &userID, &userName, &profileImage)
         if err != nil {
             log.Printf("Error scanning chat data: %v", err)
             http.Error(w, "Error scanning chat data", http.StatusInternalServerError)
@@ -456,22 +444,43 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
         if _, exists := userMap[userID]; !exists {
             userMap[userID] = User{Id: userID, Username: userName, ImageURL: profileImage}
         }
-
-        // Add message to messages slice if messageText is not empty and messageID is valid
-        if messageText.Valid && messageID.Valid {
-            messages = append(messages, Message{
-                MessageID:   messageID,   // Include message ID as sql.NullInt64
-                UserID:      messageUserID,  // Include message user ID as sql.NullInt64
-                MessageText: messageText, 
-                CreatedAt:   createdAt,
-            })
-            hasMessages = true
-        }
     }
 
-    // If no messages were found, set hasMessages to false, but still return users
-    if !hasMessages {
-        log.Println("No messages found for chat")
+    // Query to fetch the last 10 messages
+    messagesQuery := `
+        SELECT 
+            m.message_id,
+            m.user_id,
+            m.message_text,
+            m.created_at
+        FROM messages m
+        WHERE m.chat_id = ?
+        ORDER BY m.created_at DESC
+        LIMIT 10`
+
+    messageRows, err := db.Query(messagesQuery, chatID)
+    if err != nil {
+        log.Printf("Error fetching messages: %v", err)
+        http.Error(w, "Error fetching messages", http.StatusInternalServerError)
+        return
+    }
+    defer messageRows.Close()
+
+    // Collect messages
+    var messages []Message
+    for messageRows.Next() {
+        var message Message
+        err := messageRows.Scan(&message.MessageID, &message.UserID, &message.MessageText, &message.CreatedAt)
+        if err != nil {
+            log.Printf("Error scanning message data: %v", err)
+            http.Error(w, "Error scanning message data", http.StatusInternalServerError)
+            return
+        }
+        messages = append(messages, message)
+    }
+
+    for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+        messages[i], messages[j] = messages[j], messages[i]
     }
 
     // Convert user map to slice
@@ -480,7 +489,7 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
         users = append(users, user)
     }
 
-    // Prepare response with chat details, users, and messages
+    // Prepare response
     response := struct {
         ChatDetails ChatDetails `json:"chat_details"`
         Users       []User      `json:"users"`
@@ -491,12 +500,7 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
         Messages:    messages,
     }
 
-    // Log sent details (optionally)
-    log.Printf("Chat details: %+v", chatDetails)
-    log.Printf("Users: %+v", users)
-    log.Printf("Messages: %+v", messages)
-
-    // Set response header and encode response
+    // Send response
     w.Header().Set("Content-Type", "application/json")
     err = json.NewEncoder(w).Encode(response)
     if err != nil {
@@ -504,6 +508,84 @@ func (h *ChatsHandler) GetChatDetailsHandler(w http.ResponseWriter, r *http.Requ
         http.Error(w, "Error sending response", http.StatusInternalServerError)
     } else {
         log.Println("Sent chat details successfully")
+    }
+}
+
+
+func (h *ChatsHandler) GetMoreMessagesHandler(w http.ResponseWriter, r *http.Request) {
+    log.Println("Request received to fetch more messages")
+
+    // Validate user session
+    _, err := ValidateSession(w, r, db)
+    if err != nil {
+        http.Error(w, "Session invalid or expired", http.StatusUnauthorized)
+        log.Printf("Session validation error: %v", err)
+        return
+    }
+
+    // Get chat ID and last message ID from query parameters
+    chatIDStr := r.URL.Query().Get("chatId")
+    chatID, err := strconv.Atoi(chatIDStr)
+    if err != nil || chatID <= 0 {
+        http.Error(w, "Invalid chat ID", http.StatusBadRequest)
+        return
+    }
+
+    lastMessageIDStr := r.URL.Query().Get("lastMessageId")
+    lastMessageID, err := strconv.Atoi(lastMessageIDStr)
+    if err != nil || lastMessageID <= 0 {
+        http.Error(w, "Invalid last message ID", http.StatusBadRequest)
+        return
+    }
+
+    // Query to fetch older messages
+    query := `
+        SELECT 
+            m.message_id,
+            m.user_id,
+            m.message_text,
+            m.created_at
+        FROM messages m
+        WHERE m.chat_id = ? AND m.message_id < ?
+        ORDER BY m.created_at DESC
+        LIMIT 10`
+
+    // Execute the query
+    rows, err := db.Query(query, chatID, lastMessageID)
+    if err != nil {
+        log.Printf("Error fetching messages: %v", err)
+        http.Error(w, "Error fetching messages", http.StatusInternalServerError)
+        return
+    }
+    defer rows.Close()
+
+    // Collect messages
+    var messages []Message
+    for rows.Next() {
+        var message Message
+        err := rows.Scan(&message.MessageID, &message.UserID, &message.MessageText, &message.CreatedAt)
+        if err != nil {
+            log.Printf("Error scanning message data: %v", err)
+            http.Error(w, "Error scanning message data", http.StatusInternalServerError)
+            return
+        }
+        messages = append(messages, message)
+    }
+    
+    for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+        messages[i], messages[j] = messages[j], messages[i]
+    }
+
+    // Send response
+    w.Header().Set("Content-Type", "application/json")
+    err = json.NewEncoder(w).Encode(struct {
+        Messages []Message `json:"messages"`
+    }{Messages: messages})
+    if err != nil {
+        log.Printf("Error encoding response: %v", err)
+        http.Error(w, "Error sending response", http.StatusInternalServerError)
+    } else {
+        log.Println("Sent more messages successfully")
     }
 }
 

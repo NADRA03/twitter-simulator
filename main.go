@@ -74,6 +74,7 @@ func main() {
 	http.HandleFunc("/createComment", twitter.CreateComm)
 	http.HandleFunc("/postComments/", twitter.GetCommentsByPost)
 	http.HandleFunc("/a_post/", twitter.GetPostById)
+	http.HandleFunc("/loadMoreMessages", handler.GetMoreMessagesHandler)
 
 	http.Handle("/loader.js", http.FileServer(http.Dir(".")))
 	http.Handle("/search.js", http.FileServer(http.Dir(".")))

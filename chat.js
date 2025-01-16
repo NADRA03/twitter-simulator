@@ -5,6 +5,8 @@ let globalUsers = [];
 let globalMessages = [];
 let displayedMessageIds = new Set();
 let userLookup = {}; // Create a lookup for user details
+let loadingMessages = false; 
+let messagesPerRequest = 10; 
 import { loadPage } from "./loader.js";
 
 // Function to populate the user lookup
@@ -78,6 +80,11 @@ export function render(chatId) {
         return true;
     });
 
+    // const chatMessagesElement = document.getElementById("chatMessages");
+
+    // Save the current scroll position
+    // const scrollTopBefore = chatMessagesElement.scrollTop;
+
     // Create a promise array for checking user details for all messages
     const messagePromises = uniqueMessages.map(async (message) => {
         // Safely access user_id (check if valid)
@@ -109,8 +116,11 @@ export function render(chatId) {
     // Wait for all promises to resolve and then join the results
     Promise.all(messagePromises)
         .then(messageElements => {
-            document.getElementById("chatMessages").innerHTML = messageElements.join('');
-            document.getElementById("chatMessages").scrollTop = document.getElementById("chatMessages").scrollHeight;
+            const chatMessagesElement = document.getElementById("chatMessages");
+            chatMessagesElement.innerHTML = messageElements.join('');
+            
+            // Scroll to the bottom to ensure latest message is visible
+            // chatMessagesElement.scrollTop = chatMessagesElement.scrollHeight;
         })
         .catch(error => {
             console.error("Error rendering messages:", error);
@@ -445,6 +455,7 @@ async function fetchChatDetails(chatId) {
     }
 
     const messageInput = document.getElementById("addPeopleInput");
+    document.getElementById("chatMessages").addEventListener("scroll", handleScroll);
     messageInput.addEventListener("input", () => {
         const searchTerm = messageInput.value;
         searchUsers(searchTerm);
@@ -486,6 +497,43 @@ async function fetchChatDetails(chatId) {
         }
     };
 }
+
+function handleScroll() {
+    const chatMessages = document.getElementById("chatMessages");
+    if (chatMessages.scrollTop === 0 && !loadingMessages) {
+        loadMoreMessages();
+    }
+}
+
+async function loadMoreMessages() {
+    loadingMessages = true;
+
+    // Get the ID of the earliest message currently loaded
+    const lastMessageId = globalMessages.length > 0 ? globalMessages[0].message_id.Int64 : null;
+
+    fetch(`/loadMoreMessages?chatId=${chatId}&lastMessageId=${lastMessageId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(newMessages => {
+
+            if (newMessages.messages && newMessages.messages.length > 0) {
+                // Prepend the new messages to the globalMessages array
+                globalMessages = [...newMessages.messages, ...globalMessages];
+                render(chatId);
+            }
+        })
+        .catch(error => {
+            console.error("Error loading more messages:", error);
+        })
+        .finally(() => {
+            loadingMessages = false;
+        });
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
     // Extract `chatId` from the URL path
