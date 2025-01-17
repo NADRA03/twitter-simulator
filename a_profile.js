@@ -13,42 +13,36 @@ export function render(Id) {
 
 export async function initialize(Id) {
     try {
-        // Fetch the user details from the server
         const response = await fetch(`/user_profile/${Id}`);
         
         if (!response.ok) {
             throw new Error('User not found');
         }
 
-        // Parse the JSON response
         const user = await response.json();
 
-        // Default image URL if no image is provided
         const defaultImageUrl = "/assets/user2.png";
         const defaultCoverUrl = "/assets/wallpaper.png";
 
-        // Use the default image if no image URL is found
         const userImageUrl = user.image_url || defaultImageUrl;
         const userBigImageUrl = user.big_image_url || defaultCoverUrl;
 
-        // Fetch follower and following counts, defaulting to 0 if undefined
         const followersCount = await fetch(`/followersCount?user_id=${Id}`)
             .then(res => res.json())
-            .then(data => data.followersCount) // Get the count from the JSON response
+            .then(data => data.followersCount) 
             .catch(() => 0) || 0;
 
         const followingCount = await fetch(`/followingCount?user_id=${Id}`)
             .then(res => res.json())
-            .then(data => data.followingCount) // Assuming followingCount returns a similar JSON response
+            .then(data => data.followingCount) 
             .catch(() => 0) || 0;
 
-        // Populate the user details in the HTML
         const userDetailsContainer = document.getElementById('userDetails');
         userDetailsContainer.innerHTML = `
             <div>
                 <img id="bigImage" src="${userBigImageUrl}" onError="this.onerror=null; this.src='${defaultCoverUrl}'" />
                 <h2 id="username">${user.username}</h2>
-                <h2 id="name">${user.FirstName} ${user.LastName}</h2>
+                <h2 id="name">${user.first_name} ${user.last_name}</h2>
                 <img id="profileImage" src="${userImageUrl}" onError="this.onerror=null; this.src='${defaultImageUrl}'" />
                 <button id="directButton" class="direct-btn">
                     <img id="direct" src="/assets/direct.svg" alt="Direct message" />
@@ -64,10 +58,8 @@ export async function initialize(Id) {
             </div>
         `;
 
-        // Add event listener for the Follow button
         document.getElementById('followButton').addEventListener('click', async () => {
             try {
-                // Send followed_id in the URL as a query parameter
                 const followResponse = await fetch(`/follow?followed_id=${Id}`, { 
                     method: 'POST',
                     headers: {
@@ -76,15 +68,13 @@ export async function initialize(Id) {
                 });
                 
                 if (followResponse.ok && followResponse.status === 201) {
-                    // Optionally, refresh follower count after following
+
                 const updatedFollowersCount = await fetch(`/followersCount?user_id=${Id}`)
                     .then(res => res.json())
-                    .catch(() => ({ followersCount: 0 })); // Default to 0 if fetch fails
+                    .catch(() => ({ followersCount: 0 })); 
                 
-                // Extract the `followersCount` property
                 const count = updatedFollowersCount.followersCount || 0;
                 
-                // Update the text content of the element
                 document.getElementById("followersCountText").textContent = count;
                 } else {
                 document.body.dataset.status = '401'; 
@@ -98,7 +88,7 @@ export async function initialize(Id) {
         document.getElementById('directButton').addEventListener('click', async () => {
             try {
                 const response = await fetch(`/chats/direct?id=${Id}`, {
-                    method: 'POST', // Use POST for creating or directing to a chat
+                    method: 'POST', 
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -124,7 +114,6 @@ export async function initialize(Id) {
         });
         
 
-        // Fetch posts for the user and display them
         await fetchPosts(Id);
 
     } catch (error) {
@@ -137,16 +126,14 @@ function formatCreatedAt(createdAt) {
     const now = new Date();
     const postDate = new Date(createdAt);
 
-    // Check if the post date is today
     const isToday =
         now.getFullYear() === postDate.getFullYear() &&
         now.getMonth() === postDate.getMonth() &&
         now.getDate() === postDate.getDate();
 
     if (isToday) {
-        // Calculate how much time has passed
         const diffMs = now - postDate;
-        const diffMinutes = Math.floor(diffMs / 60000); // Convert ms to minutes
+        const diffMinutes = Math.floor(diffMs / 60000); 
 
         if (diffMinutes < 60) {
             return `${diffMinutes} minute(s) ago`;
@@ -155,12 +142,10 @@ function formatCreatedAt(createdAt) {
         const diffHours = Math.floor(diffMinutes / 60);
         return `${diffHours} hour(s) ago`;
     } else {
-        // Format as YYYY-MM-DD for non-today dates
         return postDate.toISOString().split('T')[0];
     }
 }
 
-// Fetches posts from the server and displays them
 async function fetchPosts(Id) {
     try {
         const response = await fetch(`/posts/?user_id=${Id}`);
@@ -168,10 +153,10 @@ async function fetchPosts(Id) {
             throw new Error(`Failed to fetch posts: ${response.statusText}`);
         }
 
-        const posts = await response.json();  // Parse the JSON response
+        const posts = await response.json();  
 
         const postsContainer = document.getElementById("postsContainer");
-        postsContainer.innerHTML = ''; // Clear previous posts
+        postsContainer.innerHTML = ''; 
 
         if (!Array.isArray(posts)) {
             console.error("Expected an array, but got:", posts);
@@ -195,12 +180,11 @@ async function fetchPosts(Id) {
                     <p class="content">${post.content}</p>
                 `;
                 postElement.addEventListener('click', () => {
-                    // Redirect to the post's detailed page
                     window.location.href = `/post/${post.id}`;
                 });
                 const postImage = postElement.querySelector(".post-image");
                 postImage.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent triggering the post click event
+                    e.stopPropagation(); 
                     window.location.href = `/a_profile/${post["user-id"]}`;
                 });
                 postsContainer.appendChild(postElement);

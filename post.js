@@ -21,7 +21,8 @@ export async function initialize(postId) {
     const post = await postResponse.json();
     const defaultImageUrl = '/assets/user2.png';
     // Render post
-    document.getElementById('post').innerHTML = `
+    const postContainer = document.getElementById('post');
+    postContainer.innerHTML = `
         <div class="post">
             <img src="${post.image_url}" onerror="this.onerror=null; this.src='${defaultImageUrl}'" class="avatar">
             <div class="post-content">
@@ -30,6 +31,11 @@ export async function initialize(postId) {
             </div>
         </div>
     `;
+    const postImage = postContainer.querySelector(".avatar");
+    postImage.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        window.location.href = `/a_profile/${post["user-id"]}`;
+    });
 
     const userResponse = await fetch('/User');
         if (!userResponse.ok) {
@@ -74,19 +80,32 @@ export async function initialize(postId) {
 function renderComment(comment) {
     const avatarURL = comment.image_url || '/assets/user2.png';
     const defaultImageUrl = '/assets/user2.png';
-    return `
+    const commentHTML = `
         <div class="comment">
             <img            
-            src="${avatarURL}" 
-            class="avatar" 
-            style="cursor: pointer;" 
-            onerror="this.onerror=null; this.src='${defaultImageUrl}'">
+                src="${avatarURL}" 
+                class="avatar" 
+                style="cursor: pointer;" 
+                onerror="this.onerror=null; this.src='${defaultImageUrl}'" 
+                data-user-id="${comment.user_id}">
             <div class="comment-content">
                 <h5>${comment.username}</h5>
                 <p>${comment.content}</p>
             </div>
         </div>
     `;
+
+    // Add event listener to the avatar image
+    setTimeout(() => {
+        const avatarImage = document.querySelector(`img[data-user-id="${comment.user_id}"]`);
+        if (avatarImage) {
+            avatarImage.addEventListener('click', () => {
+                window.location.href = `/a_profile/${comment.user_id}`;
+            });
+        }
+    }, 0);
+
+    return commentHTML;
 }
 
 // Submit a new comment

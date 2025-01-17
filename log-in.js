@@ -1,14 +1,13 @@
-// Function to show error messages dynamically
+
 function showErrorMessage(elementId, message) {
     const errorMessageElement = document.getElementById(elementId);
-    console.log('Showing error message:', message); // Log the error message
+    console.log('Showing error message:', message); 
     if (errorMessageElement) {
         errorMessageElement.textContent = message;
         errorMessageElement.style.display = "block";
     }
 }
 
-// Function to handle all event listeners related to login and signup forms
 export function setupEventListeners() {
     const goToLoginButton = document.getElementById("goToLoginButton");
     const loginForm = document.getElementById("login-form");
@@ -17,42 +16,37 @@ export function setupEventListeners() {
     const goToSignupButton = document.getElementById("goToSignupButton");
     const signupForm = document.getElementById("signup-form");
     const closeSignupButton = document.getElementById("closeSignupForm");
-
-    // Check if there's an error message in the URL query params and display it
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
-    const formType = urlParams.get('form'); // Identify which form caused the error
-    console.log("Error from URL params:", error); // Check if error is captured
+    const formType = urlParams.get('form');
+    console.log("Error from URL params:", error); 
 
     if (error) {
-        // Display the corresponding form based on the formType parameter
         if (formType === "login") {
             if (loginForm) {
                 loginForm.style.display = "block";
-                signupForm.style.display = "none"; // Hide signup form
-                console.log("Displaying login error:", error); // Confirming if it's showing login error
-                showErrorMessage('loginErrorMessage', error); // Show error for login
+                signupForm.style.display = "none"; 
+                console.log("Displaying login error:", error); 
+                showErrorMessage('loginErrorMessage', error); 
             }
         } else if (formType === "signup") {
             if (signupForm) {
                 signupForm.style.display = "block";
-                loginForm.style.display = "none"; // Hide login form
-                console.log("Displaying signup error:", error); // Confirming if it's showing signup error
-                showErrorMessage('signupErrorMessage', error); // Show error for signup
+                loginForm.style.display = "none";
+                console.log("Displaying signup error:", error); 
+                showErrorMessage('signupErrorMessage', error); 
             }
         }
     }
 
-    // Event listener to show login form and hide signup form
     if (goToLoginButton) {
         goToLoginButton.addEventListener("click", function() {
             console.log("Go to Login Button clicked!");
             loginForm.style.display = "block";
-            signupForm.style.display = "none"; // Hide signup form
+            signupForm.style.display = "none"; 
         });
     }
 
-    // Event listener to close login form
     if (closeLoginButton) {
         closeLoginButton.addEventListener("click", function() {
             console.log("Close Login Button clicked!");
@@ -60,16 +54,15 @@ export function setupEventListeners() {
         });
     }
 
-    // Event listener to show signup form and hide login form
     if (goToSignupButton) {
         goToSignupButton.addEventListener("click", function() {
             console.log("Go to Signup Button clicked!");
             signupForm.style.display = "block";
-            loginForm.style.display = "none"; // Hide login form
+            loginForm.style.display = "none"; 
         });
     }
 
-    // Event listener to close signup form
+
     if (closeSignupButton) {
         closeSignupButton.addEventListener("click", function() {
             console.log("Close Signup Button clicked!");
@@ -78,7 +71,7 @@ export function setupEventListeners() {
     }
 }
 
-// Render function to create the HTML structure
+
 export function render() {
     return `
     <div class="login-and-signup">
@@ -141,8 +134,8 @@ export function render() {
     `;
 }
 
-// Function to initialize the login module
+
 export function initialize() {
-    setupEventListeners(); // Set up event listeners after rendering the module
+    setupEventListeners(); 
 }
 

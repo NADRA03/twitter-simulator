@@ -1,6 +1,7 @@
 import { loadPage } from "./loader.js";
 const defaultImageUrl = '/assets/user2.png';
-// Renders user details dynamically without "Follow" and "Direct" buttons
+
+
 export function render(user, followersCount, followingCount) {
     const defaultImageUrl = '/assets/user2.png';
     const defaultCoverUrl = '/assets/wallpaper.png';
@@ -12,7 +13,7 @@ export function render(user, followersCount, followingCount) {
             <div>
                 <img id="bigImage" src="${userBigImageUrl}" onError="this.onerror=null; this.src='${defaultCoverUrl}'" />
                 <h2 id="username">${user.username}</h2>
-                <h2 id="name">${user.FirstName} ${user.LastName}</h2>
+                <h2 id="name">${user.first_name} ${user.last_name}</h2>
                 <img id="profileImage" src="${userImageUrl}" onError="this.onerror=null; this.src='${defaultImageUrl}'" />
             </div>
             <div id="followInfo">
@@ -22,35 +23,39 @@ export function render(user, followersCount, followingCount) {
             <div id="postsContainer">
                 <!-- Posts will be dynamically added here -->
             </div>
+<div id="logoutContainer">
+    <form id="logoutForm" action="/logout" method="POST">
+        <button id="logoutButton" type="submit">Logout</button>
+    </form>
+</div>
         </div>
     `;
 }
 
-// Initialize and load user details with posts
+
 export async function initialize() {
     try {
-        // Fetch user details
         const response = await fetch('/User');
         if (!response.ok) {
             throw new Error(`Failed to fetch user details: ${response.statusText}`);
         }
-
+   
         const user = await response.json();
         const followersCount = await fetch(`/followersCount?user_id=${user.id}`)
         .then(res => res.json())
-        .then(data => data.followersCount) // Get the count from the JSON response
+        .then(data => data.followersCount) 
         .catch(() => 0) || 0;
 
         const followingCount = await fetch(`/followingCount?user_id=${user.id}`)
         .then(res => res.json())
-        .then(data => data.followingCount) // Assuming followingCount returns a similar JSON response
+        .then(data => data.followingCount) 
         .catch(() => 0) || 0;
 
         const app = document.getElementById('app');
         app.innerHTML = render(user, followersCount, followingCount);
 
-        // Fetch and display posts for the user
         await fetchPosts(user.id);
+
     } catch (error) {
         console.error('Error initializing user details:', error);
         document.body.dataset.status = '401'; 
@@ -58,7 +63,7 @@ export async function initialize() {
     }
 }
 
-// Fetch posts for a user and render them
+
 async function fetchPosts(userId) {
     try {
         const response = await fetch(`/posts/?user_id=${userId}`);
@@ -68,7 +73,7 @@ async function fetchPosts(userId) {
 
         const posts = await response.json();
         const postsContainer = document.getElementById('postsContainer');
-        postsContainer.innerHTML = ''; // Clear existing posts
+        postsContainer.innerHTML = ''; 
 
         if (!Array.isArray(posts) || posts.length === 0) {
             postsContainer.innerHTML = '<p>No posts available</p>';
@@ -88,7 +93,6 @@ async function fetchPosts(userId) {
             `;
 
             postElement.addEventListener('click', () => {
-                // Redirect to the post's detailed page
                 window.location.href = `/post/${post.id}`;
             });
             postsContainer.appendChild(postElement);
@@ -101,7 +105,7 @@ async function fetchPosts(userId) {
     }
 }
 
-// Format post date for display
+
 function formatCreatedAt(createdAt) {
     const now = new Date();
     const postDate = new Date(createdAt);

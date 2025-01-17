@@ -1,4 +1,4 @@
-// Render function to initialize the basic HTML structure for the search page
+
 export function render() {
     return `
         <div class="search-container">
@@ -18,7 +18,7 @@ export function render() {
     `;
 }
 
-// Function to search for users based on input
+
 function searchUsers(searchTerm) {
     if (searchTerm) {
         fetch(`/search-users?term=${encodeURIComponent(searchTerm)}`)
@@ -26,23 +26,19 @@ function searchUsers(searchTerm) {
             .then(users => displaySearchResults(users))
             .catch(error => console.error('Error fetching users:', error));
     } else {
-        // Clear search results if input is empty
         document.getElementById("userSearchResults").innerHTML = "";
     }
 }
 
-// Function to display search results for "People"
 function displaySearchResults(users) {
     const userSearchResults = document.getElementById("userSearchResults");
-    userSearchResults.innerHTML = ""; // Clear previous results
+    userSearchResults.innerHTML = ""; 
 
-    // Ensure users is an array
     if (!Array.isArray(users)) {
-        users = []; // If users is not an array (e.g., null), set it to an empty array
+        users = []; 
     }
 
     if (users.length === 0) {
-        // Display a message when no users are found
         const noUsersElement = document.createElement("div");
         noUsersElement.id = "noUsersMessage";
         noUsersElement.textContent = "No users found.";
@@ -59,11 +55,9 @@ function displaySearchResults(users) {
             <span style="cursor: pointer;" data-user-id="${user.id}">${user.username}</span>
         `;
 
-        // Add event listeners for both image and name
         const userImage = userElement.querySelector('img');
         const userName = userElement.querySelector('span');
 
-        // Redirect to the user's profile page when image or name is clicked
         [userImage, userName].forEach(element => {
             element.addEventListener('click', () => {
                 window.location.href = `/a_profile/${user.id}`;
@@ -74,7 +68,6 @@ function displaySearchResults(users) {
     });
 }
 
-// Initialize function to set up event listeners
 export async function initialize() {
     const searchInput = document.getElementById("searchInput");
     searchInput.addEventListener("input", () => {
@@ -82,24 +75,20 @@ export async function initialize() {
         searchUsers(searchTerm);
     });
 
-    // Tab buttons
     const peopleTab = document.getElementById("peopleTab");
     const latestTab = document.getElementById("latestTab");
     const topTab = document.getElementById("topTab");
     const mediaTab = document.getElementById("mediaTab");
 
-    // Set "People" as the active tab initially
     function setActiveTab(activeTab) {
         [peopleTab, latestTab, topTab, mediaTab].forEach(tab => {
             tab.classList.remove("active");
         });
         activeTab.classList.add("active");
 
-        // For now, only display "People" results
         if (activeTab === peopleTab) {
             searchUsers(searchInput.value);
         } else {
-            // Clear results for other tabs
             document.getElementById("userSearchResults").innerHTML = `<p>No results for ${activeTab.innerText} yet.</p>`;
         }
     }

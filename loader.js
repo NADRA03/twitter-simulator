@@ -1,5 +1,3 @@
-// loader.js
-
 export async function loadSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebar2 = document.getElementById('sidebar2');
@@ -7,7 +5,6 @@ export async function loadSidebar() {
     try {
         const sidebarModule = await import('./sidebar.js');
         sidebar.innerHTML = sidebarModule.render();
-        // sidebarModule.initialize();
 
 
         const sidebar2Module = await import('./sidebar2.js');
@@ -97,7 +94,6 @@ export async function loadPage(page) {
                         break;
             case 'chat':
                 
-                // Render the main chat page (chats) and initialize chat-specific module
                 module = await import('./chats.js');
                 app.innerHTML = module.render();
                 module.initialize();
@@ -171,7 +167,6 @@ export async function getCurrentPage() {
     }
 }
 
-// Initialize and load the current page on DOMContentLoaded
 async function initialize() {
     const page = await getCurrentPage();
     await loadPage(page);

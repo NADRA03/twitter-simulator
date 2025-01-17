@@ -11,9 +11,8 @@ async function fetchAllUsers() {
         if (!response.ok) throw new Error("Failed to fetch users");
 
         const users = await response.json();
-        console.log("Users retrieved:", users); // Log retrieved users
+        console.log("Users retrieved:", users); 
 
-        // You may still want to enable or disable the create chat button based on user availability
         document.getElementById("createChatButton").disabled = users.length === 0;
     } catch (error) {
         document.body.dataset.status = '401'; 
@@ -25,60 +24,53 @@ async function fetchAllUsers() {
 async function fetchUserChats() {
     try {
         const response = await fetch('/chats/user');
-        console.log("Response status:", response.status); // Log the response status
+        console.log("Response status:", response.status); 
 
-        // Check if the response is OK (status 200)
         if (!response.ok) {
-            const text = await response.text(); // Read the response as text
+            const text = await response.text(); 
             console.error(`Failed to fetch chats: ${response.status} - ${text}`);
             throw new Error(`Failed to fetch chats: ${response.statusText}`);
         }
 
-        const text = await response.text(); // Read the response as text first
-        console.log("Response text:", text); // Log the raw response text
+        const text = await response.text(); 
+        console.log("Response text:", text); 
 
         let chats;
         try {
-            chats = JSON.parse(text); // Attempt to parse the text as JSON
+            chats = JSON.parse(text); 
         } catch (error) {
             console.error("Failed to parse JSON:", error);
-            chats = null; // Set chats to null if parsing fails
+            chats = null;
         }
 
-        // Check if chats is null
         if (chats === null) {
             console.log("No chats found.");
             const chatList = document.getElementById("chatList");
-            chatList.innerHTML = "<li>No chats found.</li>"; // Display message for no chats
-            return; // Exit the function if chats is null
+            chatList.innerHTML = "<li>No chats found.</li>"; 
+            return; 
         }
 
-        // Check if chats is an array
         if (!Array.isArray(chats)) {
             console.error("Chats is not an array:", chats);
-            // Display message for unexpected response format
             const chatList = document.getElementById("chatList");
             chatList.innerHTML = "<li>Unexpected response format. No chats available.</li>"; 
-            return; // Exit the function if chats is not an array
+            return; 
         }
 
         const chatList = document.getElementById("chatList");
-        // Check if the chatList element exists
         if (!chatList) {
             console.error("Chat list element not found.");
-            return; // Exit the function if the chatList is not found
+            return; 
         }
 
-        chatList.innerHTML = ""; // Clear existing chat list
+        chatList.innerHTML = ""; 
 
-        // Check if there are any chats
         if (chats.length === 0) {
             console.log("No chats found.");
-            chatList.innerHTML = "<li>No chats found.</li>"; // Display message for no chats
-            return; // Exit the function early if no chats
+            chatList.innerHTML = "<li>No chats found.</li>"; 
+            return; 
         }
 
-        // Populate the chat list with chats
         chats.forEach(chat => {
             const chatItem = document.createElement("li");
             chatItem.className = "chat-item";
@@ -97,25 +89,21 @@ async function fetchUserChats() {
             chatList.appendChild(chatItem);
         });
 
-        // Add event listeners for chat buttons after they are rendered
         const chatButtons = document.querySelectorAll('.chat-button');
         chatButtons.forEach(button => {
             button.onclick = function() {
-                const chatId = this.dataset.chatId; // Retrieve the chat ID from data attribute
-                navigateToChat(chatId); // Call the navigate function with chat ID
+                const chatId = this.dataset.chatId; 
+                navigateToChat(chatId); 
             };
         });
     } catch (error) {
         console.error("Error fetching chats:", error);
-        // Optionally, display a generic message on error
         const chatList = document.getElementById("chatList");
         chatList.innerHTML = "<li>Error fetching chats. Please try again later.</li>";
     }
 }
 
-// Handle form submission
 
-// Render the HTML
 export function render() {
     return `
         <div class="chats">
@@ -147,20 +135,16 @@ export function render() {
 }
 
 
-// Function to initialize the page
 export function initialize() {
 
-    // Fetch initial data
     fetchAllUsers();
     fetchUserChats();
 
-    // Add event listener to the button to show/hide the form
     document.getElementById('showChatFormButton').onclick = function() {
         const formContainer = document.getElementById('createChatFormContainer');
         formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
     };
 
-    // Add event listener for the close button
     document.getElementById('closeChatFormButton').onclick = function() {
         document.getElementById('createChatFormContainer').style.display = 'none';
     };
@@ -171,5 +155,4 @@ function navigateToChat(chatId) {
 }
 
 
-// Call the initialize function to set everything up
 document.addEventListener("DOMContentLoaded", initialize);

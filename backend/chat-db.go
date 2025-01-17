@@ -5,13 +5,11 @@ import(
 	"fmt"
 )
 
-// Define the struct for LastMessage
 type LastMessage struct {
     MessageText string `json:"message_text"`
     CreatedAt   string `json:"created_at"`
 }
 
-// Define the struct for Chat
 type Chat struct {
     ChatID      int       `json:"chat_id"`
     Type        string     `json:"type"`
@@ -23,15 +21,12 @@ type Chat struct {
 func CreateChat(db *sql.DB, bio string, image string, chatType string) (int, error) {
     var chatID int
     var query string
-
-    // Build the query based on whether the image is provided
     if image != "" {
         query = "INSERT INTO chats (bio, image_url, type) VALUES (?, ?, ?) RETURNING id"
     } else {
         query = "INSERT INTO chats (bio, type) VALUES (?, ?) RETURNING id"
     }
 
-    // Execute the query and scan the chat ID
     err := db.QueryRow(query, bio, image, chatType).Scan(&chatID)
     if err != nil {
         return 0, fmt.Errorf("error creating chat: %v", err)
@@ -49,7 +44,6 @@ func AddUserToChat(db *sql.DB, chatID int, userID int, role string) error {
 }
 
 func GetUserChats(db *sql.DB, userID int) ([]Chat, error) {
-    // Prepare the query to fetch chat details and the last message for the given user ID
     query := `
         SELECT 
             c.id AS chat_id, 

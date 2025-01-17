@@ -47,7 +47,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
             password := r.FormValue("loginpassword")
             fmt.Printf("Received login: Username: %s, Password: %s\n", username, password)
 
-            // Add error handling and pass messages to the front-end
             exists, err := LoginUser(db, username, password)
             if err != nil {
                 log.Printf("Error logging user: %v", err)
@@ -57,7 +56,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
             if !exists {
                 log.Println("Invalid username or password")
-                // Pass error to the HTML template (e.g., show on the page)
                 http.Redirect(w, r, "/log-in?error=Invalid+username+or+password&form=login", http.StatusSeeOther)
                 return
             }
@@ -102,7 +100,6 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
             age := r.FormValue("age")
             gender := r.FormValue("gender")
 
-            // Validation logic
             if err := ValidUsername(db, username); err != nil {
                 http.Redirect(w, r, "/log-in?error="+url.QueryEscape(err.Error())+"&form=signup", http.StatusSeeOther)
                 return
@@ -118,7 +115,6 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
                 return
             }
 
-            // Check if username or email already exists
             exists, err := UserExists(db, username, email)
             if err != nil {
                 log.Printf("Error checking user existence: %v", err)
@@ -158,60 +154,55 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
-// GetAllUserDetailsHandler retrieves all user details and sends them as a JSON response
 func GetAllUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
     log.Println("Loading users")
 
-    // Define the query to fetch all user details including ID
+
     query := `SELECT username, image_url, id FROM users`
     rows, err := db.Query(query)
     if err != nil {
-        log.Printf("Error querying all users: %v\n", err) // Log the specific error
+        log.Printf("Error querying all users: %v\n", err) 
         http.Error(w, "Failed to fetch user details", http.StatusInternalServerError)
         return
     }
     defer rows.Close()
 
-    var users []User // Use a slice to hold User structs
+    var users []User
     for rows.Next() {
         var username string
         var imageUrl sql.NullString
-        var id int // Variable to hold user ID
+        var id int 
 
-        // Scan the row into the variables
+
         if err := rows.Scan(&username, &imageUrl, &id); err != nil {
-            log.Printf("Error scanning user row: %v\n", err) // Log the specific error
+            log.Printf("Error scanning user row: %v\n", err) 
             http.Error(w, "Failed to scan user details", http.StatusInternalServerError)
             return
         }
 
-        // Create a User struct and populate it
         user := User{
             Username: username,
             ImageURL: imageUrl,
-            Id: id, // Add ID to the User struct
+            Id: id, 
         }
         if !user.ImageURL.Valid {
-            user.ImageURL.String = "" // Set to empty string if NULL
+            user.ImageURL.String = "" 
         }
 
-        users = append(users, user) // Append user to the slice
+        users = append(users, user) 
     }
 
-    // Check for errors encountered during iteration
     if err := rows.Err(); err != nil {
-        log.Printf("Error during rows iteration: %v\n", err) // Log the specific error
+        log.Printf("Error during rows iteration: %v\n", err) 
         http.Error(w, "Failed during row iteration", http.StatusInternalServerError)
         return
     }
 
-    // Set the response header to JSON
     w.Header().Set("Content-Type", "application/json")
 
-    // Send the users as a JSON response
     if err := json.NewEncoder(w).Encode(users); err != nil {
-        log.Printf("Error encoding JSON response: %v\n", err) // Log the specific error
-        http.Error(w, "Failed to encode response", http.StatusInternalServerError) // Handle JSON encoding errors
+        log.Printf("Error encoding JSON response: %v\n", err) 
+        http.Error(w, "Failed to encode response", http.StatusInternalServerError) 
         return
     }
 
@@ -222,7 +213,6 @@ func GetAllUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
 func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
     log.Println("UserDetailsHandler: Profile is loading")
 
-    // Get the session
     session, err := GetSession(r, db)
     if err != nil {
         log.Printf("UserDetailsHandler: Error getting session: %v", err)
@@ -231,10 +221,11 @@ func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
     }
     log.Printf("UserDetailsHandler: Session retrieved for UserID %d", session.UserID)
 
-    // Query the user details based on session's UserID
     var user User
-    err = db.QueryRow("SELECT id, username, email, image_url, big_image_url FROM Users WHERE id = ?", session.UserID).
-        Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL, &user.BigImageURL)
+    err = db.QueryRow(`
+        SELECT id, username, email, image_url, big_image_url, first_name, last_name
+        FROM Users WHERE id = ?`, session.UserID).
+        Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL, &user.BigImageURL, &user.FirstName, &user.LastName)
     if err != nil {
         if err == sql.ErrNoRows {
             log.Println("UserDetailsHandler: User not found in database")
@@ -246,7 +237,6 @@ func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Check if ImageURL and BigImageURL are valid, and set them to empty strings if NULL
     if !user.ImageURL.Valid {
         user.ImageURL.String = ""
     }
@@ -256,7 +246,6 @@ func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
     log.Printf("UserDetailsHandler: User details retrieved: %+v", user)
 
-    // Send the user details as JSON
     w.Header().Set("Content-Type", "application/json")
     if err := json.NewEncoder(w).Encode(user); err != nil {
         log.Printf("UserDetailsHandler: Error encoding user data to JSON: %v", err)
@@ -268,22 +257,17 @@ func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
 func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
     log.Println("UserDetailsHandler: Profile is loading")
 
-    // Extract the userID from the URL path
     path := r.URL.Path
-    // Split the URL path to get the user ID (assuming the URL structure is /a_profile/{id})
     parts := strings.Split(path, "/")
 
-    // Ensure there are at least 3 parts in the path: ["", "a_profile", "{id}"]
     if len(parts) < 3 {
         log.Println("UserDetailsHandler: Invalid URL path")
         http.Error(w, "invalid URL", http.StatusBadRequest)
         return
     }
 
-    // The ID should be the last part of the path
     userID := parts[len(parts)-1]
 
-    // Check if userID is valid
     if userID == "" {
         log.Println("UserDetailsHandler: No user ID provided in URL path")
         http.Error(w, "user ID is required", http.StatusBadRequest)
@@ -292,13 +276,14 @@ func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
     log.Printf("UserDetailsHandler: Retrieving details for UserID %s", userID)
 
-    // Query the user details based on the userID from the URL path
     var user User
-    err := db.QueryRow("SELECT id, username, email, image_url, big_image_url FROM Users WHERE id = ?", userID).
-        Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL, &user.BigImageURL)
+    err := db.QueryRow(`
+        SELECT id, username, email, image_url, big_image_url, first_name, last_name 
+        FROM Users WHERE id = ?`, userID).
+        Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL, &user.BigImageURL, &user.FirstName, &user.LastName)
     if err != nil {
         if err == sql.ErrNoRows {
-            log.Println("UserDetailsHandler: User not found in database")
+            log.Println("AUserDetailsHandler: User not found in database")
             http.Error(w, "user not found", http.StatusNotFound)
             return
         }
@@ -307,7 +292,6 @@ func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Check if ImageURL and BigImageURL are valid, and set them to empty strings if NULL
     if !user.ImageURL.Valid {
         user.ImageURL.String = ""
     }
@@ -317,7 +301,6 @@ func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
     log.Printf("UserDetailsHandler: User details retrieved: %+v", user)
 
-    // Send the user details as JSON
     w.Header().Set("Content-Type", "application/json")
     if err := json.NewEncoder(w).Encode(user); err != nil {
         log.Printf("UserDetailsHandler: Error encoding user data to JSON: %v", err)

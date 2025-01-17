@@ -146,4 +146,25 @@
     left: 65px;
 }
 
+#logoutContainer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#logoutButton {
+    color: #f95e5e;
+    padding: 10px 20px;
+    font-family: "Regular";
+    border: none;
+    background-color: transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 25px;
+    transition: background-color 0.3s;
+}
+
+#logoutButton:hover {
+    color: #e60000;
+}
+
 }

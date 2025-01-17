@@ -143,3 +143,40 @@ func DeleteExpiredSessions(db *sql.DB) error {
 	}
 	return nil
 }
+
+
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			http.Redirect(w, r, "/log-in", http.StatusSeeOther)
+			return
+		}
+		http.Error(w, "Error retrieving session token", http.StatusInternalServerError)
+		return
+	}
+
+	sessionToken := cookie.Value
+	stmt, err := db.Prepare("DELETE FROM Sessions WHERE token = ?")
+	if err != nil {
+		http.Error(w, "Error preparing delete statement", http.StatusInternalServerError)
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(sessionToken)
+	if err != nil {
+		http.Error(w, "Error executing delete statement", http.StatusInternalServerError)
+		return
+	}
+
+	clearedCookie := &http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		Path:     "/",
+	}
+	http.SetCookie(w, clearedCookie)
+
+	http.Redirect(w, r, "/log-in", http.StatusSeeOther)
+}

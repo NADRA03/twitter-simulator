@@ -107,7 +107,6 @@ func CreateComment(userID, postID int, content string , username string) error {
 }
 
 func CreateComm(w http.ResponseWriter, r *http.Request) {
-    // Log the raw request body
     body, err := io.ReadAll(r.Body)
     if err != nil {
         http.Error(w, "Failed to read request body", http.StatusInternalServerError)
@@ -115,7 +114,6 @@ func CreateComm(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Println("Received body:", string(body))
 
-    // Reset the request body for decoding
     r.Body = io.NopCloser(bytes.NewReader(body))
 
     var commentData struct {
@@ -124,8 +122,6 @@ func CreateComm(w http.ResponseWriter, r *http.Request) {
         Content  string `json:"content"`
         Username string `json:"username"`
     }
-
-    // Decode JSON into struct
     if err := json.NewDecoder(r.Body).Decode(&commentData); err != nil {
         fmt.Printf("Decode error: %v\n", err)
         http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -133,15 +129,11 @@ func CreateComm(w http.ResponseWriter, r *http.Request) {
     }
 
     fmt.Printf("Parsed comment data: %+v\n", commentData)
-
-    // Create the comment
     err = CreateComment(commentData.UserID, commentData.PostID, commentData.Content, commentData.Username)
     if err != nil {
         http.Error(w, fmt.Sprintf("Error creating comment: %v", err), http.StatusInternalServerError)
         return
     }
-
-    // Return success response
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
     json.NewEncoder(w).Encode(map[string]string{"message": "Comment created successfully"})

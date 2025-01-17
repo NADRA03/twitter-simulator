@@ -9,7 +9,6 @@ import (
 )
 
 func AddFollowHandler(w http.ResponseWriter, r *http.Request) {
-	// Validate session to get userID
 	session, err := ValidateSession(w, r, db)
 	if err != nil {
 		log.Println("addFollowHandler - ValidateSession: Session validation failed", err)
@@ -19,7 +18,6 @@ func AddFollowHandler(w http.ResponseWriter, r *http.Request) {
 	userID := session.UserID
 	fmt.Printf("Session validated, userID: %d\n", userID)
 
-	// Get followed_id from the URL query parameters
 	followedIDStr := r.URL.Query().Get("followed_id")
 	followedID, err := strconv.Atoi(followedIDStr)
 	if err != nil || followedID <= 0 {
@@ -27,7 +25,6 @@ func AddFollowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insert the follow relationship into the database
 	_, err = db.Exec("INSERT OR IGNORE INTO follow (follower_id, followed_id) VALUES (?, ?)", userID, followedID)
 	if err != nil {
 		http.Error(w, "Could not follow user", http.StatusInternalServerError)
@@ -39,7 +36,6 @@ func AddFollowHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func FollowingCountHandler(w http.ResponseWriter, r *http.Request) {
-	// Get the user ID from the URL query parameter
 	userIDStr := r.URL.Query().Get("user_id")
 	if userIDStr == "" {
 		http.Error(w, "User ID is required", http.StatusBadRequest)
@@ -65,9 +61,9 @@ func FollowingCountHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("Following count: %d", count)))
 }
 
-// Handler to get the followers count for a user by userID from the request parameter
+
 func FollowersCountHandler(w http.ResponseWriter, r *http.Request) {
-	// Get the user ID from the URL query parameter
+
 	userIDStr := r.URL.Query().Get("user_id")
 	if userIDStr == "" {
 		http.Error(w, "User ID is required", http.StatusBadRequest)
@@ -89,14 +85,12 @@ func FollowersCountHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Send the followers count as JSON
 	response := map[string]int{"followersCount": count}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
 func TopFollowedUserIDsHandler(w http.ResponseWriter, r *http.Request) {
-	// Validate session to get the current user's ID
 	session, err := ValidateSession(w, r, db)
 	if err != nil {
 		log.Println("TopFollowedUserIDsHandler - ValidateSession: Session validation failed", err)
@@ -106,7 +100,6 @@ func TopFollowedUserIDsHandler(w http.ResponseWriter, r *http.Request) {
 	userID := session.UserID
 	fmt.Printf("Session validated, userID: %d\n", userID)
 
-	// Query to get the IDs of the top 10 most-followed users excluding those already followed by the session user
 	query := `
         SELECT u.id
         FROM users u
@@ -128,7 +121,6 @@ func TopFollowedUserIDsHandler(w http.ResponseWriter, r *http.Request) {
 
 	var topUserIDs []int
 
-	// Iterate over the result set and add each user ID to the topUserIDs slice
 	for rows.Next() {
 		var id int
 		if err := rows.Scan(&id); err != nil {
@@ -139,21 +131,19 @@ func TopFollowedUserIDsHandler(w http.ResponseWriter, r *http.Request) {
 		topUserIDs = append(topUserIDs, id)
 	}
 
-	// Check for errors after iterating over rows
 	if err = rows.Err(); err != nil {
 		log.Printf("TopFollowedUserIDsHandler: Error during row iteration: %v", err)
 		http.Error(w, "Failed during row iteration", http.StatusInternalServerError)
 		return
 	}
 
-	// Log the results
 	if len(topUserIDs) == 0 {
 		fmt.Println("No top followed users found.")
 	} else {
 		fmt.Printf("Top followed user IDs: %v\n", topUserIDs)
 	}
 
-	// Set the response header to JSON and encode the top user IDs as JSON
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(topUserIDs); err != nil {
 		log.Printf("TopFollowedUserIDsHandler: Error encoding JSON response: %v", err)

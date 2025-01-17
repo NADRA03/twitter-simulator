@@ -7,10 +7,10 @@ import (
 	twitter "twitter/backend"
 )
 
-// indexHandler serves index.html for any request
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.HasSuffix(r.URL.Path, ".js") || strings.HasSuffix(r.URL.Path, ".css") || strings.HasPrefix(r.URL.Path, "/fonts/") {
-		http.NotFound(w, r) // Let static file handlers take over
+		http.NotFound(w, r) 
 		return
 	}
 	http.ServeFile(w, r, "./index.html")
@@ -36,8 +36,8 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	twitter.InitializeDB()
-	// Test calling GetDB to log the message
-	twitter.GetDB() // This will trigger the log
+
+	twitter.GetDB()
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/log-in", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
@@ -75,6 +75,7 @@ func main() {
 	http.HandleFunc("/postComments/", twitter.GetCommentsByPost)
 	http.HandleFunc("/a_post/", twitter.GetPostById)
 	http.HandleFunc("/loadMoreMessages", handler.GetMoreMessagesHandler)
+	http.HandleFunc("/logout", twitter.LogoutHandler)
 
 	http.Handle("/loader.js", http.FileServer(http.Dir(".")))
 	http.Handle("/search.js", http.FileServer(http.Dir(".")))
@@ -93,7 +94,6 @@ func main() {
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./fonts"))))
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
-	// Start the server on port 8080
 
 	fmt.Println("Server started at :8088")
 	if err := http.ListenAndServe(":8088", nil); err != nil {
