@@ -1,3 +1,4 @@
+import { loadPage } from "./loader.js";
 let socket;
 let chatId;
 let globalChatDetails = null;
@@ -83,10 +84,15 @@ export function render(chatId) {
         const imageUrl = message.image_url.Valid ? message.image_url.String : null;
         const messageElement = `
             <div class="message-item ${isCurrentUserMessage ? 'right' : ''}">
-                <img src="${user.imageUrl || '/assets/user2.png'}" class="user-image" />
-                <span class="message-username">${user.username}:</span>
-                <span class="message-text">${messageText}</span>
-                ${imageUrl ? `<img src="${imageUrl}" class="message-image" />` : ''}
+    <img src="${user.imageUrl || '/assets/user2.png'}" class="user-image" />
+    <span class="message-username">${user.username}:</span>
+    <div class="message-details">
+        <span class="message-time">${formatTime(message.created_at.Time)}</span>
+        <div class="message-text-container">
+            <span class="message-text">${messageText}</span>
+            ${imageUrl ? `<img src="${imageUrl}" class="message-image" />` : ''}
+        </div>
+    </div>
             </div>
         `;
         
@@ -134,7 +140,7 @@ export function render(chatId) {
                             <img src="${user.image_url.String || '/assets/user2.png'}" alt="${user.username}'s profile picture" class="user-image" />
                             <span class="user-name">${user.username}</span>
                             <span class="user-status ${userLookup[user.id].onlineStatus === 'Online' ? 'online' : 'offline'}">
-                                ${userLookup[user.id].onlineStatus}
+                                ${userLookup[user.id].onlineStatus} 
                             </span>
                         </div>
                     `).join('')}
@@ -180,10 +186,14 @@ async function displayMessage(messageData) {
     const messageElement = document.createElement("div");
     messageElement.className = "message-item";
     messageElement.innerHTML = `
-        <img src="${user.imageUrl || '/assets/user2.png'}"  class="user-image" />
+    <img src="${user.imageUrl || '/assets/user2.png'}" class="user-image" />
+    <div class="message-header">
         <span class="message-username">${user.username}:</span>
+    </div>
+    <div class="message-text-container">
         <span class="message-text">${messageData.message_text}</span>
         ${messageData.image_url ? `<img src="${messageData.image_url}" alt="Attached image" class="message-image" />` : ''}
+    </div>
     `;
     const isCurrentUserMessage = await fetchUserDetails(messageData.user_id);
     console.log("isCurrentUserMessage:", isCurrentUserMessage); 
@@ -195,6 +205,31 @@ async function displayMessage(messageData) {
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+
+function formatTime(createdAt) {
+    try {
+        const messageTime = new Date(createdAt);
+        const now = new Date();
+        
+        // If the message was sent within the last 5 seconds, show "Now"
+        if ((now - messageTime) <= 5000) {
+            return 'Now';
+        }
+
+        // If it's the same day, show the time in "HH:mm" format
+        if (messageTime.toDateString() === now.toDateString()) {
+            return messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Otherwise, show the full date
+        return messageTime.toLocaleString();
+    } catch (error) {
+        console.error("Error formatting time:", error);
+        return ''; // Return nothing (empty string) on error
+    }
+}
+
 
 
 function initializeWebSocket(chatId) {
@@ -255,6 +290,7 @@ function sendMessage(chatId) {
                     console.log("Message successfully sent:", messageData);
                     messageInput.value = "";
                     if (imageInput) imageInput.value = "";
+                    // loadPage(`chats`);
                 } catch (sendError) {
                     console.error("Failed to send message:", sendError);
                     alert("There was an error sending your message. Please try again.");
@@ -399,12 +435,24 @@ async function fetchChatDetails(chatId) {
 }
 
 
+
+
+//////////////////////////////////initialize
  export async function initialize(chatIdParam) {
     chatId = chatIdParam;
     console.log("Chat ID:", chatId); 
     
     initializeWebSocket(chatId);
+    
+    // try {
     await fetchChatDetails(chatId);
+    // }
+    // catch (error) {
+    //     console.error("Error fetching or rendering chat details:", error);
+    //     sidebar2.innerHTML = "    You don't have this chat.";
+    //     return;
+    // }
+
     
     const chatContent = render(chatId);
     document.getElementById("sidebar2").innerHTML = chatContent;

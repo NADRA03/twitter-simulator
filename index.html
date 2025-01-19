@@ -20,11 +20,113 @@
     <div id="sidebar" class="sidebar-right"></div>
     <script type="module">
         import { loadSidebar, loadPage, getCurrentPage } from '/loader.js';
-
+        
         window.onload = async () => {
             const currentPage = await getCurrentPage();
             await loadPage(currentPage);
+
+            setInterval(setOnlineStatus, 30000); 
+
+            window.addEventListener('beforeunload', setOfflineStatus);
         };
+
+        function setOnlineStatus() {
+            fetch('/online', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("User status updated to online");
+                } else {
+                    console.error("Failed to update user status to online");
+                }
+            })
+            .catch(error => {
+                console.error("Error updating user status to online:", error);
+            });
+        }
+
+        function setOfflineStatus() {
+            fetch('/offline', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("User status updated to offline");
+                } else {
+                    console.error("Failed to update user status to offline");
+                }
+            })
+            .catch(error => {
+                console.error("Error updating user status to offline:", error);
+            });
+        }
+
+
+        function showPageNotification(title, sender, messageText) {
+    // Log the details that will be shown in the notification
+    console.log(`Preparing page notification: Title: ${title}, Sender: ${sender}, Message: ${messageText}`);
+
+    // Create a notification div
+    const notification = document.createElement('div');
+    notification.classList.add('notification');  // You can add custom styles to 'notification'
+
+    // Set the content of the notification
+    notification.innerHTML = `
+        <strong>${title}</strong><br>
+        <em>${sender}</em>: ${messageText}
+    `;
+
+    // Append the notification to the page (for example, at the top of the body)
+    document.body.appendChild(notification);
+
+    // Set a timeout to remove the notification after a few seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);  // Notification will disappear after 5 seconds
+}
+
+// Function to check for new messages
+function checkForNewMessages() {
+    console.log("Checking for new messages...");
+    fetch('/new-message')  // Make a request to your Go server
+        .then(response => response.json())
+        .then(data => {
+            // Proceed only if there are last messages
+            if (data.last_messages && data.last_messages.length > 0) {
+                data.last_messages.forEach(message => {
+                    // Only show notification if message_text is valid
+                    if (message.message_text && message.message_text.trim() !== "") {
+                        // Log message details before showing notification
+                        console.log(`Found new message: Sender: ${message.sender_name}, Message: ${message.message_text}`);
+                        showPageNotification("New Message", message.sender_name, message.message_text);
+                    } else {
+                        console.log("Empty message text, skipping notification.");
+                    }
+                });
+            } else {
+                console.log("No new messages found.");
+                // Optionally, you can choose to show a generic "No new messages" notification
+                // showPageNotification("No new messages", "", "No new messages in the last 3 seconds");
+            }
+        })
+        .catch(error => {
+            console.error("Error checking for new messages: ", error);
+        });
+}
+
+// Check for new messages every second
+setInterval(checkForNewMessages, 1000);
     </script>
 </body>
 </html>

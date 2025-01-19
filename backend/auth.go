@@ -306,4 +306,49 @@ func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
         log.Printf("UserDetailsHandler: Error encoding user data to JSON: %v", err)
         http.Error(w, "error encoding JSON", http.StatusInternalServerError)
     }
+    
+}
+
+func UpdateUserStatus(w http.ResponseWriter, r *http.Request) {
+    session, err := GetSession(r, db)
+    if err != nil {
+        return
+    }
+    
+    userID := session.UserID
+    status := "online" // Assuming "online" means the user is on the page
+    
+    // Update user status in the database to "online"
+    query := `UPDATE Users SET status = ? WHERE id = ?`
+    _, err = db.Exec(query, status, userID)
+    if err != nil {
+        log.Printf("Error updating user status: %v", err)
+        http.Error(w, "Failed to update status", http.StatusInternalServerError)
+        return
+    }
+
+    log.Printf("User status updated to 'online' for UserID: %d", userID)
+    w.WriteHeader(http.StatusOK)
+}
+
+func SetUserOffline(w http.ResponseWriter, r *http.Request) {
+    session, err := GetSession(r, db)
+    if err != nil {
+        return
+    }
+    
+    userID := session.UserID
+    status := "offline" // Assuming "offline" means the user has left the page
+    
+    // Update user status in the database to "offline"
+    query := `UPDATE Users SET status = ? WHERE id = ?`
+    _, err = db.Exec(query, status, userID)
+    if err != nil {
+        log.Printf("Error updating user status: %v", err)
+        http.Error(w, "Failed to update status", http.StatusInternalServerError)
+        return
+    }
+
+    log.Printf("User status updated to 'offline' for UserID: %d", userID)
+    w.WriteHeader(http.StatusOK)
 }

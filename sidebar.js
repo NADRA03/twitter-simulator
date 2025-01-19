@@ -12,8 +12,10 @@ Home
                 <li><a href="/chats" onclick="loadPage('chats'); return false;">Chats</a></li>
                 <li><a href="/search" onclick="loadPage('search'); return false;">Search</a></li>
                 <li><a href="/profile" onclick="loadPage('profile'); return false;">Profile</a></li>
-                <!-- Add more chat links as needed -->
             </ul>
+                                <form id="logoutForm" action="/logout" method="POST">
+        <button id="logoutButton" type="submit">Logout</button>
+    </form>
         </nav>
     `;
 }

@@ -5,13 +5,16 @@ import(
 	"fmt"
 )
 
+// Define the struct for LastMessage
 type LastMessage struct {
     MessageText string `json:"message_text"`
     CreatedAt   string `json:"created_at"`
 }
 
+// Define the struct for Chat
 type Chat struct {
     ChatID      int       `json:"chat_id"`
+    Status      string     `json:"status"`
     Type        string     `json:"type"`
     Name        string    `json:"name"`
     ImageURL    string    `json:"image"`
@@ -21,6 +24,7 @@ type Chat struct {
 func CreateChat(db *sql.DB, bio string, image string, chatType string) (int, error) {
     var chatID int
     var query string
+
     if image != "" {
         query = "INSERT INTO chats (bio, image_url, type) VALUES (?, ?, ?) RETURNING id"
     } else {

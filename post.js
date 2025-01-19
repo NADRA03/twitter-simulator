@@ -135,7 +135,6 @@ async function submitComment(postId, content) {
         });
 
         if (response.ok) {
-            alert('Comment submitted successfully!');
             location.reload();
         } else {
             const errorText = await response.text();

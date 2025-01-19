@@ -71,23 +71,60 @@ async function fetchUserChats() {
             return; 
         }
 
+        chats.sort((a, b) => {
+            // Priority 1: Online status (online first)
+            if (a.status === "online" && b.status !== "online") return -1;
+            if (a.status !== "online" && b.status === "online") return 1;
+
+            // Priority 2: Last message date (most recent first)
+            const dateA = new Date(a.last_message.created_at);
+            const dateB = new Date(b.last_message.created_at);
+
+            if (dateA > dateB) return -1; // Most recent first
+            if (dateA < dateB) return 1;
+
+            // Priority 3: Alphabetical order by name
+            const nameA = a.name.toLowerCase();
+            const nameB = b.name.toLowerCase();
+
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+
+            return 0; // Names are equal
+        });
+
+        // Render the sorted chats
         chats.forEach(chat => {
             const chatItem = document.createElement("li");
             chatItem.className = "chat-item";
 
+            const imageUrl = chat.image ? chat.image : defaultImageUrl;
+            const borderColor = chat.status === "online" ? "green" : "transparent";
+
             chatItem.innerHTML = `
-            <button class="chat-button" data-chat-id="${chat.chat_id}">
-                <img src="${chat.image}" alt="chat group" class="chat-image" onError="this.onerror=null; this.src='${defaultImageUrl}'"
-                />
-            </button>
-            <div class="chat-details">
-                <h3>${chat.name}</h3>
-                <p style="color:green;">${chat.last_message.message_text ? chat.last_message.message_text : 'No messages yet'}</p>
-            </div>
+                <button class="chat-button" data-chat-id="${chat.chat_id}">
+                    <img 
+                        src="${imageUrl}" 
+                        alt="chat group" 
+                        class="chat-image" 
+                        style="border: 3px solid ${borderColor}; border-radius: 50%; width: 50px; height: 50px;" 
+                        onError="this.onerror=null; this.src='${defaultImageUrl}'"
+                    />
+                </button>
+                <div class="chat-details">
+                    <h3>${chat.name}</h3>
+                    <p style="color:green;">
+                        ${chat.last_message.message_text ? chat.last_message.message_text : 'No messages yet'}
+                    <span style="color:grey; margin-left: 10px;">
+                       ${formatTime(chat.last_message.created_at)}
+                    </span>
+                    </p>
+                </div>
             `;
 
             chatList.appendChild(chatItem);
         });
+
 
         const chatButtons = document.querySelectorAll('.chat-button');
         chatButtons.forEach(button => {
@@ -102,6 +139,38 @@ async function fetchUserChats() {
         chatList.innerHTML = "<li>Error fetching chats. Please try again later.</li>";
     }
 }
+
+function formatTime(dateString) {
+    // Check if dateString is valid
+    const messageTime = new Date(dateString);
+    
+    // If the date is invalid, return an empty string
+    if (isNaN(messageTime)) {
+        return '';
+    }
+
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - messageTime) / 1000);
+    
+    // If message was sent less than 5 seconds ago, show "now"
+    if (diffInSeconds <= 5) {
+        return 'now';
+    }
+
+    // Check if the message was sent today
+    const isSameDay = now.toDateString() === messageTime.toDateString();
+    
+    if (isSameDay) {
+        const hours = messageTime.getHours().toString().padStart(2, '0');
+        const minutes = messageTime.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`; // Only show the time if sent today
+    }
+
+    // If not today, show the full date
+    return messageTime.toLocaleString();
+}
+
+setInterval(fetchUserChats, 5000);
 
 
 export function render() {

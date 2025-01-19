@@ -34,6 +34,7 @@ type Message struct {
     MessageText sql.NullString  `json:"message_text"`
     ImageURL    sql.NullString  `json:"image_url"`
     CreatedAt   sql.NullTime    `json:"created_at"`
+    SenderName  sql.NullString  `json:"sender_name"`
 }
 
 
@@ -253,6 +254,15 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
                 )
                 ELSE c.image
             END AS chat_image_url,
+            CASE 
+                WHEN c.type = 'private' THEN (
+                    SELECT u.status 
+                    FROM users u
+                    JOIN chat_users cu ON u.id = cu.user_id
+                    WHERE cu.chat_id = c.id AND u.id != ?
+                )
+                ELSE NULL
+            END AS chat_status,
             c.type AS chat_type,
             COALESCE(m.message_text, '') AS last_message_text,
             COALESCE(m.created_at, '') AS last_message_created_at
@@ -270,7 +280,7 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
         WHERE cu.user_id = ?
     `
 
-    rows, err := db.Query(query, session.UserID, session.UserID, session.UserID)
+    rows, err := db.Query(query, session.UserID, session.UserID, session.UserID, session.UserID)
     if err != nil {
         log.Printf("Error executing query: %v", err)
         http.Error(w, "Error fetching user chats", http.StatusInternalServerError)
@@ -282,7 +292,8 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
     for rows.Next() {
         var chat Chat
         var chatImageURL sql.NullString
-        if err := rows.Scan(&chat.ChatID, &chat.Name, &chatImageURL, &chat.Type, &chat.LastMessage.MessageText, &chat.LastMessage.CreatedAt); err != nil {
+        var chatStatus sql.NullString
+        if err := rows.Scan(&chat.ChatID, &chat.Name, &chatImageURL, &chatStatus, &chat.Type, &chat.LastMessage.MessageText, &chat.LastMessage.CreatedAt); err != nil {
             log.Printf("Error scanning chat data: %v", err)
             http.Error(w, "Error scanning chat data", http.StatusInternalServerError)
             return
@@ -292,6 +303,12 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
             chat.ImageURL = chatImageURL.String
         } else {
             chat.ImageURL = ""
+        }
+
+        if chatStatus.Valid {
+            chat.Status = chatStatus.String
+        } else {
+            chat.Status = ""
         }
 
         chats = append(chats, chat)
@@ -309,6 +326,7 @@ func (h *ChatsHandler) GetUserChatsHandler(w http.ResponseWriter, r *http.Reques
         http.Error(w, "Error encoding response as JSON", http.StatusInternalServerError)
     }
 }
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
@@ -534,6 +552,94 @@ func (h *ChatsHandler) GetMoreMessagesHandler(w http.ResponseWriter, r *http.Req
         http.Error(w, "Error sending response", http.StatusInternalServerError)
     } else {
         log.Println("Sent more messages successfully")
+    }
+}
+
+func (h *ChatsHandler) GetAllLastMessagesHandler(w http.ResponseWriter, r *http.Request) {
+    log.Println("Request received to fetch last messages of all chats")
+
+    // Validate session and get the session details
+    session, err := ValidateSession(w, r, db)
+    if err != nil {
+        log.Printf("Session validation error: %v", err)
+        http.Error(w, "Session invalid or expired", http.StatusUnauthorized)
+        return
+    }
+
+    // Get user ID from the session
+    userID := session.UserID
+
+    // Query to get the last message for each chat the user is part of, excluding messages from the current user
+    query := `
+        SELECT 
+            m.message_text,
+            u.username AS sender_name
+        FROM chats c
+        LEFT JOIN chat_users cu ON c.id = cu.chat_id
+        LEFT JOIN messages m ON c.id = m.chat_id
+        LEFT JOIN users u ON m.user_id = u.id
+        WHERE cu.user_id = ? 
+          AND m.created_at >= datetime('now','-6 seconds') 
+          AND m.user_id != ?  -- Exclude messages written by the current user
+        ORDER BY m.created_at DESC`
+
+    rows, err := db.Query(query, userID, userID)
+    if err != nil {
+        log.Printf("Error executing query: %v", err)
+        http.Error(w, "Error fetching messages", http.StatusInternalServerError)
+        return
+    }
+    defer rows.Close()
+
+    var lastMessages []struct {
+        MessageText string `json:"message_text"`
+        SenderName  string `json:"sender_name"`
+    }
+
+    // Loop through rows to build the response
+    for rows.Next() {
+        var message struct {
+            MessageText string `json:"message_text"`
+            SenderName  string `json:"sender_name"`
+        }
+
+        err := rows.Scan(&message.MessageText, &message.SenderName)
+        if err != nil {
+            log.Printf("Error scanning message data: %v", err)
+            http.Error(w, "Error scanning message data", http.StatusInternalServerError)
+            return
+        }
+
+        lastMessages = append(lastMessages, message)
+    }
+
+    if err = rows.Err(); err != nil {
+        log.Printf("Error iterating over rows: %v", err)
+        http.Error(w, "Error processing messages", http.StatusInternalServerError)
+        return
+    }
+
+    // Send the response
+    w.Header().Set("Content-Type", "application/json")
+    if len(lastMessages) == 0 {
+        err = json.NewEncoder(w).Encode(struct {
+            Message string `json:"message"`
+        }{Message: "No new messages in the last 3 seconds"})
+    } else {
+        err = json.NewEncoder(w).Encode(struct {
+            LastMessages []struct {
+                MessageText string `json:"message_text"`
+                SenderName  string `json:"sender_name"`
+            } `json:"last_messages"`
+        }{LastMessages: lastMessages})
+    }
+
+    if err != nil {
+        log.Printf("Error encoding response: %v", err)
+        http.Error(w, "Error sending response", http.StatusInternalServerError)
+    } else {
+        log.Println("Sent last messages successfully")
+        log.Println(lastMessages)
     }
 }
 

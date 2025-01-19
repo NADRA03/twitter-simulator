@@ -208,8 +208,23 @@ button {
     margin-right: 5px;
 }
 
-#chatMessages .message-item .message-text {
+/* #chatMessages .message-item .message-text {
     flex: 1;
+} */
+
+.message-text-container {
+    max-width: 100%;
+    word-wrap: break-word; /* Ensures the message text breaks to the next line */
+    flex-direction: column;
+}
+
+.message-text {
+    white-space: pre-wrap;  /* Allows line breaks within the text */
+    word-wrap: break-word;  /* Breaks long words to avoid overflow */
+}
+
+.message-time {
+    color: grey;
 }
 
 /* If the message belongs to the logged-in user (move it to the right) */
@@ -225,6 +240,17 @@ button {
     margin-top: 10px;
     border-radius: 5px;
 }
+
+#addPeopleInput {
+    width: 370px;
+}
+
+input:focus {
+    outline: none; /* Prevent the browser's default outline */
+    border-bottom: 1px solid gray; /* Optional: Add a custom border when focused */
+}
+
+
 
 }
 

@@ -76,6 +76,9 @@ func main() {
 	http.HandleFunc("/a_post/", twitter.GetPostById)
 	http.HandleFunc("/loadMoreMessages", handler.GetMoreMessagesHandler)
 	http.HandleFunc("/logout", twitter.LogoutHandler)
+	http.HandleFunc("/online", twitter.UpdateUserStatus)
+	http.HandleFunc("/offline", twitter.SetUserOffline)
+	http.HandleFunc("/new-message", handler.GetAllLastMessagesHandler)
 
 	http.Handle("/loader.js", http.FileServer(http.Dir(".")))
 	http.Handle("/search.js", http.FileServer(http.Dir(".")))
