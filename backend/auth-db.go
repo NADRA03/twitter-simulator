@@ -125,7 +125,7 @@ func LoginUser(db *sql.DB, username, password string,) (bool, error) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Username not found
-			fmt.Println("Username not found")
+			// fmt.Println("Username not found")
 			return false, nil
 		}
 		return false, fmt.Errorf("error querying database: %v", err)
@@ -135,7 +135,7 @@ func LoginUser(db *sql.DB, username, password string,) (bool, error) {
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
 		// Invalid password
-		fmt.Println("Invalid password")
+		// fmt.Println("Invalid password")
 		return false, nil
 	}
 

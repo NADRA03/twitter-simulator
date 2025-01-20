@@ -93,7 +93,7 @@ func GetCommentsByPost(w http.ResponseWriter, r *http.Request) {
 
 func CreateComment(userID, postID int, content string , username string) error {
     createdAt := time.Now().Format(time.RFC3339)
-    fmt.Println(username)
+    // fmt.Println(username)
     stmt, err := db.Prepare("INSERT INTO Comments (user_id, post_id, content,  username, created_at ) VALUES (?, ?, ?, ?, ?)")
     if err != nil {
         return fmt.Errorf("error preparing insert statement: %v", err)
@@ -112,7 +112,7 @@ func CreateComm(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Failed to read request body", http.StatusInternalServerError)
         return
     }
-    fmt.Println("Received body:", string(body))
+    // fmt.Println("Received body:", string(body))
 
     r.Body = io.NopCloser(bytes.NewReader(body))
 

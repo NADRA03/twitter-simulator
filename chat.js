@@ -106,6 +106,9 @@ export function render(chatId) {
             chatMessagesElement.innerHTML = messageElements.join('');
             // Scroll to the bottom to ensure latest message is visible
             // chatMessagesElement.scrollTop = chatMessagesElement.scrollHeight;
+            if (!globalMessages || globalMessages.length === 0) {
+                document.getElementById("chatMessages").innerHTML = "";
+            }
         })
         .catch(error => {
             console.error("Error rendering messages:", error);
@@ -125,14 +128,23 @@ export function render(chatId) {
                 <button id="closeInfoBox" class="close-button">X</button>
                 <br>
                 <p>Information about the chat...</p>
-                <button id="addPeopleButton">Invite</button>
-                <div id="addPeopleSection" style="display: none;">
-                    <p>Add people to the chat:</p>
-                    <input type="text" id="addPeopleInput" />
-                    <button style="display: none;" id="confirmAddPeopleBtn">Add</button>
-                </div>
-                <div id="userSearchResults"></div>
-
+${globalChatDetails?.type !== 'private' ? `
+    <button id="addPeopleButton">Invite</button>
+    <div id="addPeopleSection" style="display: none;">
+        <p>Add people to the chat:</p>
+        <input type="text" id="addPeopleInput" />
+        <button style="display: none;" id="confirmAddPeopleBtn">Add</button>
+    </div>
+    <div id="userSearchResults"></div>
+` : `
+    <button id="addPeopleButton" style="display: none;">Invite</button>
+    <div id="addPeopleSection" style="display: none;">
+        <p style="display: none;">Add people to the chat:</p>
+        <input type="text" id="addPeopleInput" style="display: none;" />
+        <button id="confirmAddPeopleBtn" style="display: none;">Add</button>
+    </div>
+    <div id="userSearchResults" style="display: none;"></div>
+`}
                 <div id="userList" class="user-list">
                     <h3>Participants</h3>
                     ${globalUsers.map(user => `

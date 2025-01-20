@@ -8,7 +8,7 @@ import(
 
 
 func SearchUsers(w http.ResponseWriter, r *http.Request) {
-    log.Println("Request received to search for users")
+    // log.Println("Request received to search for users")
 
     // Get the search term from the query parameters
     searchTerm := r.URL.Query().Get("term")

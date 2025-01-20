@@ -138,7 +138,7 @@ func TopFollowedUserIDsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(topUserIDs) == 0 {
-		fmt.Println("No top followed users found.")
+		// fmt.Println("No top followed users found.")
 	} else {
 		fmt.Printf("Top followed user IDs: %v\n", topUserIDs)
 	}

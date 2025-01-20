@@ -55,7 +55,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
             }
 
             if !exists {
-                log.Println("Invalid username or password")
+                // log.Println("Invalid username or password")
                 http.Redirect(w, r, "/log-in?error=Invalid+username+or+password&form=login", http.StatusSeeOther)
                 return
             }
@@ -155,7 +155,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func GetAllUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
-    log.Println("Loading users")
+    // log.Println("Loading users")
 
 
     query := `SELECT username, image_url, id FROM users`
@@ -206,12 +206,12 @@ func GetAllUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    log.Println("Users sent successfully")
+    // log.Println("Users sent successfully")
 }
 
 
 func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
-    log.Println("UserDetailsHandler: Profile is loading")
+    // log.Println("UserDetailsHandler: Profile is loading")
 
     session, err := GetSession(r, db)
     if err != nil {
@@ -228,7 +228,7 @@ func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
         Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL, &user.BigImageURL, &user.FirstName, &user.LastName)
     if err != nil {
         if err == sql.ErrNoRows {
-            log.Println("UserDetailsHandler: User not found in database")
+            // log.Println("UserDetailsHandler: User not found in database")
             http.Error(w, "user not found", http.StatusNotFound)
             return
         }
@@ -255,13 +255,13 @@ func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
-    log.Println("UserDetailsHandler: Profile is loading")
+    // log.Println("UserDetailsHandler: Profile is loading")
 
     path := r.URL.Path
     parts := strings.Split(path, "/")
 
     if len(parts) < 3 {
-        log.Println("UserDetailsHandler: Invalid URL path")
+        // log.Println("UserDetailsHandler: Invalid URL path")
         http.Error(w, "invalid URL", http.StatusBadRequest)
         return
     }
@@ -269,7 +269,7 @@ func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
     userID := parts[len(parts)-1]
 
     if userID == "" {
-        log.Println("UserDetailsHandler: No user ID provided in URL path")
+        // log.Println("UserDetailsHandler: No user ID provided in URL path")
         http.Error(w, "user ID is required", http.StatusBadRequest)
         return
     }
@@ -283,7 +283,7 @@ func AUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
         Scan(&user.Id, &user.Username, &user.Email, &user.ImageURL, &user.BigImageURL, &user.FirstName, &user.LastName)
     if err != nil {
         if err == sql.ErrNoRows {
-            log.Println("AUserDetailsHandler: User not found in database")
+            // log.Println("AUserDetailsHandler: User not found in database")
             http.Error(w, "user not found", http.StatusNotFound)
             return
         }
