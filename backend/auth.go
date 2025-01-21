@@ -14,6 +14,7 @@ import(
 
 type User struct {
 	Id        int            `json:"id"`          // Unique identifier for the user
+    Status    string         `json:"status"`  
 	Username  string         `json:"username"`    // Unique username for the user
 	Email     string         `json:"email"`       // Unique email for the user
 	FirstName string         `json:"first_name"`  // User's first name
@@ -155,13 +156,25 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func GetAllUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
-    // log.Println("Loading users")
-
-
-    query := `SELECT username, image_url, id FROM users`
-    rows, err := db.Query(query)
+    // Retrieve session and check if it's valid
+    session, err := GetSession(r, db)
     if err != nil {
-        log.Printf("Error querying all users: %v\n", err) 
+        // No session, return empty data (no users to show)
+        log.Printf("UserDetailsHandler: No session found, returning empty data")
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        w.Write([]byte("[]")) // Return empty JSON array
+        return
+    }
+
+    // Log that session was retrieved for the user
+    log.Printf("UserDetailsHandler: Session retrieved for UserID %d", session.UserID)
+
+    // Modify the query to exclude the current user based on their UserID
+    query := `SELECT username, image_url, id, status FROM users WHERE id != ?`
+    rows, err := db.Query(query, session.UserID)  // Exclude current user by passing session.UserID
+    if err != nil {
+        log.Printf("Error querying all users: %v\n", err)
         http.Error(w, "Failed to fetch user details", http.StatusInternalServerError)
         return
     }
@@ -171,11 +184,11 @@ func GetAllUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
     for rows.Next() {
         var username string
         var imageUrl sql.NullString
-        var id int 
+        var id int
+        var status string
 
-
-        if err := rows.Scan(&username, &imageUrl, &id); err != nil {
-            log.Printf("Error scanning user row: %v\n", err) 
+        if err := rows.Scan(&username, &imageUrl, &id, &status); err != nil {
+            log.Printf("Error scanning user row: %v\n", err)
             http.Error(w, "Failed to scan user details", http.StatusInternalServerError)
             return
         }
@@ -183,31 +196,33 @@ func GetAllUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
         user := User{
             Username: username,
             ImageURL: imageUrl,
-            Id: id, 
-        }
-        if !user.ImageURL.Valid {
-            user.ImageURL.String = "" 
+            Id: id,
+            Status:   status,
         }
 
-        users = append(users, user) 
+        if !user.ImageURL.Valid {
+            user.ImageURL.String = ""
+        }
+
+        users = append(users, user)
     }
 
     if err := rows.Err(); err != nil {
-        log.Printf("Error during rows iteration: %v\n", err) 
+        log.Printf("Error during rows iteration: %v\n", err)
         http.Error(w, "Failed during row iteration", http.StatusInternalServerError)
         return
     }
 
+    // Return the list of users excluding the current user
     w.Header().Set("Content-Type", "application/json")
-
     if err := json.NewEncoder(w).Encode(users); err != nil {
-        log.Printf("Error encoding JSON response: %v\n", err) 
-        http.Error(w, "Failed to encode response", http.StatusInternalServerError) 
+        log.Printf("Error encoding JSON response: %v\n", err)
+        http.Error(w, "Failed to encode response", http.StatusInternalServerError)
         return
     }
-
-    // log.Println("Users sent successfully")
 }
+
+
 
 
 func UserDetailsHandler(w http.ResponseWriter, r *http.Request) {

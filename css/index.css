@@ -107,19 +107,41 @@ body {
 }
 
 #user-list {
+    max-height: 750px; /* Set a fixed height */
+    overflow-y: auto;
+    scrollbar-width: none; /* For Firefox: hide scrollbar */
+    -ms-overflow-style: none; 
     li {
         list-style-type: none; /* Remove bullets */        /* Remove default margin */
     } 
 
+    #user-list::-webkit-scrollbar {
+        display: none; /* For Chrome, Safari, and Edge: hide scrollbar */
+    }
+
     .user-avatar {
         width:  70px;
         height: 70px;
+        border-radius: 50%;
+        border: 2px solid transparent; /* Default border */
+        box-sizing: border-box; 
     }
 
     .user-item {
         display: flex;
         padding-bottom: 20px;
     }
+
+    .username {
+        position: relative;
+        top: 30px;
+        left: 10px;
+    }
+
+.user-avatar.online {
+    border-color: green; /* Green border for online users */
+}
+
     
 }
 
