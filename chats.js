@@ -116,7 +116,7 @@ async function fetchUserChats() {
                     <p style="color:green;">
                         ${chat.last_message.message_text ? chat.last_message.message_text : 'No messages yet'}
                     <span style="color:grey; margin-left: 10px;">
-                       ${formatTime(chat.last_message.created_at)}
+                       ${chat.last_message.created_at}
                     </span>
                     </p>
                 </div>
@@ -140,35 +140,7 @@ async function fetchUserChats() {
     }
 }
 
-function formatTime(dateString) {
-    // Check if dateString is valid
-    const messageTime = new Date(dateString);
-    
-    // If the date is invalid, return an empty string
-    if (isNaN(messageTime)) {
-        return '';
-    }
 
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - messageTime) / 1000);
-    
-    // If message was sent less than 5 seconds ago, show "now"
-    if (diffInSeconds <= 5) {
-        return 'now';
-    }
-
-    // Check if the message was sent today
-    const isSameDay = now.toDateString() === messageTime.toDateString();
-    
-    if (isSameDay) {
-        const hours = messageTime.getHours().toString().padStart(2, '0');
-        const minutes = messageTime.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`; // Only show the time if sent today
-    }
-
-    // If not today, show the full date
-    return messageTime.toLocaleString();
-}
 
 setInterval(fetchUserChats, 5000);
 
